@@ -1,0 +1,142 @@
+* {
+  box-sizing: border-box;
+}
+
+/* Smooth transition for theme changes */
+body,
+.rt-Theme {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Sidebar hover effect */
+.sidebar-item:hover {
+  background-color: var(--gray-4);
+}
+
+/* Theme selector styles */
+.theme-preview {
+  transition: all 0.2s ease-in-out;
+  border: 2px solid transparent;
+}
+
+.theme-preview:hover {
+  transform: scale(1.02);
+  border-color: var(--accent-8);
+}
+
+.theme-preview-selected {
+  border: 2px solid var(--accent-9);
+  box-shadow: 0 0 0 1px var(--accent-8);
+}
+
+/* Smooth transitions for all interactive elements */
+button, 
+.rt-Card,
+.rt-IconButton {
+  transition: all 0.15s ease-in-out;
+}
+
+/* Enhanced scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--gray-3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gray-8);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-9);
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Animation classes */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* Focus styles */
+.rt-TextField:focus-within,
+.rt-TextArea:focus-within,
+.rt-Select:focus-within {
+  outline: 2px solid var(--accent-8);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .theme-preview {
+    border-width: 3px;
+  }
+  
+  .rt-Card {
+    border-width: 2px;
+  }
+}
