@@ -23,7 +23,8 @@ import {
   Separator,
   IconButton,
   Checkbox,
-  Code
+  Code,
+  DropdownMenu
 } from '@radix-ui/themes'
 import { 
   PlusIcon, 
@@ -35,8 +36,7 @@ import {
   ActivityLogIcon,
   CheckCircledIcon
 } from '@radix-ui/react-icons'
-// Note: DropdownMenu is already imported from @radix-ui/themes in the main block.
-// Redundant import at the end of the original file will be removed.
+// DropdownMenu from @radix-ui/themes is now correctly imported above.
 import DataTable from '../../components/DataTable' // Reusable DataTable component
 import { useToast } from '../../components/notifications/toast-context' // For toast notifications
 

@@ -129,3 +129,5 @@ dist
 # AI
 CLAUDE.md
 .CLAUDE
+.DS_Store
+.DS_Store

@@ -511,7 +511,7 @@ export default function Settings() {
                     </Text>
                     
                     {(() => {
-                      const storageInfo = storage.getInfo()
+                      const storageInfo = storage.utils.getInfo()
                       return (
                         <Flex direction="column" gap="2">
                           <Flex justify="between">
@@ -536,7 +536,7 @@ export default function Settings() {
                       color="red" 
                       mt="3"
                       onClick={() => {
-                        storage.clear()
+                        storage.utils.clearAll()
                         showToast({
                           type: 'success',
                           title: 'Storage cleared',
@@ -1045,7 +1045,7 @@ function StorageInfoDisplay() {
           <Badge color="green" variant="soft">
             Used Space: {storageInfo?.totalSize || 0} KB
           </Badge>
-          {storageInfo?.expiredItems?.length > 0 && (
+          {storageInfo && storageInfo.expiredItems && storageInfo.expiredItems.length > 0 && (
             <Badge color="orange" variant="soft">
               Expired Items: {storageInfo.expiredItems.length}
             </Badge>
