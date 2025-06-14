@@ -1,8 +1,15 @@
+/**
+ * @file Tracking.tsx
+ * @description This file defines the System Tracking page component for the dashboard.
+ * It provides a user interface for monitoring the status and performance of various
+ * network systems or devices. Features include filtering, different view modes (grid/list),
+ * and actions for individual systems. All data is currently mock data with simulated real-time updates.
+ */
 import { useState, useEffect } from 'react'
-import { 
-  Box, 
-  Card, 
-  Flex, 
+import {
+  Box,
+  Card,
+  Flex,
   Heading, 
   Text, 
   Badge, 
@@ -29,27 +36,62 @@ import {
   FileTextIcon,
   BellIcon
 } from '@radix-ui/react-icons'
-import { useToast } from '../../components/notifications/toast-context'
+import { useToast } from '../../components/notifications/toast-context' // For showing toast messages
 
+/**
+ * @typedef {'desktop' | 'server' | 'laptop' | 'mobile'} SystemType
+ * @description Represents the type of a system being tracked.
+ */
+type SystemType = 'desktop' | 'server' | 'laptop' | 'mobile';
+
+/**
+ * @typedef {'online' | 'offline' | 'warning'} SystemStatus
+ * @description Represents the operational status of a system.
+ */
+type SystemStatus = 'online' | 'offline' | 'warning';
+
+/**
+ * @interface System
+ * @description Defines the structure for a system object being tracked.
+ * @property {string} id - Unique identifier for the system.
+ * @property {string} name - Display name of the system.
+ * @property {string} ipAddress - IP address of the system.
+ * @property {SystemType} type - The type of the system (e.g., 'desktop', 'server').
+ * @property {string} os - Operating system running on the system.
+ * @property {string} osVersion - Version of the operating system.
+ * @property {SystemStatus} status - Current operational status of the system.
+ * @property {number} cpuUsage - Current CPU utilization percentage.
+ * @property {number} memoryUsage - Current memory utilization percentage.
+ * @property {number} diskUsage - Current disk space utilization percentage.
+ * @property {number} uptime - System uptime in hours.
+ * @property {Date} lastSeen - Timestamp of when the system was last detected or reported status.
+ * @property {string} department - Department the system belongs to.
+ * @property {string} location - Physical or logical location of the system.
+ * @property {number} alerts - Number of active alerts for this system.
+ */
 interface System {
-  id: string
-  name: string
-  ipAddress: string
-  type: 'desktop' | 'server' | 'laptop' | 'mobile'
-  os: string
-  osVersion: string
-  status: 'online' | 'offline' | 'warning'
-  cpuUsage: number
-  memoryUsage: number
-  diskUsage: number
-  uptime: number // in hours
-  lastSeen: Date
-  department: string
-  location: string
-  alerts: number
+  id: string;
+  name: string;
+  ipAddress: string;
+  type: SystemType;
+  os: string;
+  osVersion: string;
+  status: SystemStatus;
+  cpuUsage: number;
+  memoryUsage: number;
+  diskUsage: number;
+  uptime: number; // in hours
+  lastSeen: Date;
+  department: string;
+  location: string;
+  alerts: number;
 }
 
-// Mock data
+// TODO: Replace mockSystems with actual data fetched from an API or data source.
+/**
+ * @const mockSystems
+ * @description An array of mock system data used for demonstration purposes.
+ */
 const mockSystems: System[] = [
   {
     id: 'SYS001',
@@ -153,114 +195,195 @@ const mockSystems: System[] = [
     location: 'Mobile',
     alerts: 0
   }
-]
+  // ... more mock systems
+];
 
+/**
+ * @function Tracking
+ * @description The main component for the System Tracking page.
+ * It displays a dashboard for monitoring various systems, allowing users to filter,
+ * switch views (grid/list), and perform actions on individual systems.
+ * @returns {JSX.Element} The rendered System Tracking page.
+ */
 export default function Tracking() {
-  const { showToast } = useToast()
-  const [systems, setSystems] = useState<System[]>(mockSystems)
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [typeFilter, setTypeFilter] = useState('all')
-  const [departmentFilter, setDepartmentFilter] = useState('all')
-  const [searchTerm, setSearchTerm] = useState('')
+  const { showToast } = useToast(); // Hook for displaying toast notifications
+  const [systems, setSystems] = useState<System[]>(mockSystems); // State for the list of systems
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid'); // State for current view mode
+  const [statusFilter, setStatusFilter] = useState('all'); // Filter by system status
+  const [typeFilter, setTypeFilter] = useState('all'); // Filter by system type
+  const [departmentFilter, setDepartmentFilter] = useState('all'); // Filter by department
+  const [searchTerm, setSearchTerm] = useState(''); // Search term for filtering
 
-  // Simulate real-time updates
+  // Effect to simulate real-time updates to system metrics (CPU, memory)
   useEffect(() => {
     const interval = setInterval(() => {
-      setSystems(prev => prev.map(system => ({
-        ...system,
-        cpuUsage: Math.max(0, Math.min(100, system.cpuUsage + (Math.random() - 0.5) * 10)),
-        memoryUsage: Math.max(0, Math.min(100, system.memoryUsage + (Math.random() - 0.5) * 5)),
-        lastSeen: system.status === 'online' ? new Date() : system.lastSeen
-      })))
-    }, 5000)
+      setSystems(prevSystems => prevSystems.map(system => {
+        // Only update 'online' systems for more realistic simulation
+        if (system.status === 'online') {
+          return {
+            ...system,
+            // Simulate realistic fluctuations
+            cpuUsage: Math.max(10, Math.min(95, system.cpuUsage + (Math.random() - 0.45) * 15)),
+            memoryUsage: Math.max(20, Math.min(90, system.memoryUsage + (Math.random() - 0.4) * 10)),
+            lastSeen: new Date()
+          };
+        }
+        return system; // Return unchanged if not online
+      }));
+    }, 5000); // Update every 5 seconds
 
-    return () => clearInterval(interval)
-  }, [])
+    return () => clearInterval(interval); // Cleanup interval on component unmount
+  }, []); // Empty dependency array means this effect runs once on mount and cleans up on unmount
 
+  /**
+   * @const filteredSystems
+   * @description Memoized list of systems after applying current filters and search term.
+   */
   const filteredSystems = systems.filter(system => {
-    if (statusFilter !== 'all' && system.status !== statusFilter) return false
-    if (typeFilter !== 'all' && system.type !== typeFilter) return false
-    if (departmentFilter !== 'all' && system.department !== departmentFilter) return false
-    if (searchTerm && !system.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        !system.ipAddress.includes(searchTerm)) return false
-    return true
-  })
+    if (statusFilter !== 'all' && system.status !== statusFilter) return false;
+    if (typeFilter !== 'all' && system.type !== typeFilter) return false;
+    if (departmentFilter !== 'all' && system.department !== departmentFilter) return false;
+    if (searchTerm &&
+        !system.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        !system.ipAddress.includes(searchTerm) &&
+        !system.os.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        !system.location.toLowerCase().includes(searchTerm.toLowerCase())
+       ) return false;
+    return true;
+  });
 
-  const getStatusIcon = (status: System['status']) => {
+  /**
+   * @function getStatusIcon
+   * @description Returns an icon component based on the system's status.
+   * @param {SystemStatus} status - The status of the system.
+   * @returns {JSX.Element} The corresponding icon.
+   */
+  const getStatusIcon = (status: SystemStatus): JSX.Element => {
     switch (status) {
       case 'online':
-        return <CheckCircledIcon />
+        return <CheckCircledIcon />;
       case 'offline':
-        return <CrossCircledIcon />
+        return <CrossCircledIcon />;
       case 'warning':
-        return <ExclamationTriangleIcon />
+        return <ExclamationTriangleIcon />;
+      default: // Should not happen with SystemStatus type
+        return <ExclamationTriangleIcon />;
     }
-  }
+  };
 
-  const getStatusColor = (status: System['status']) => {
+  /**
+   * @function getStatusColor
+   * @description Returns a color name (from Radix theme colors) based on system status.
+   * @param {SystemStatus} status - The status of the system.
+   * @returns {'green' | 'red' | 'orange'} The color name.
+   */
+  const getStatusColor = (status: SystemStatus): 'green' | 'red' | 'orange' => {
     switch (status) {
       case 'online':
-        return 'green'
+        return 'green';
       case 'offline':
-        return 'red'
+        return 'red';
       case 'warning':
-        return 'orange'
+        return 'orange';
+      default:
+        return 'gray'; // Fallback, though status is typed
     }
-  }
+  };
 
-  const getSystemIcon = (type: System['type']) => {
+  /**
+   * @function getSystemIcon
+   * @description Returns an icon component based on the system's type.
+   * @param {SystemType} type - The type of the system.
+   * @returns {JSX.Element} The corresponding icon.
+   */
+  const getSystemIcon = (type: SystemType): JSX.Element => {
     switch (type) {
       case 'desktop':
       case 'server':
       case 'laptop':
-        return <DesktopIcon />
+        return <DesktopIcon />;
       case 'mobile':
-        return <MobileIcon />
+        return <MobileIcon />;
+      default: // Should not happen with SystemType
+        return <DesktopIcon />;
     }
-  }
+  };
 
-  const getUsageColor = (usage: number) => {
-    if (usage >= 90) return 'red'
-    if (usage >= 70) return 'orange'
-    return 'green'
-  }
+  /**
+   * @function getUsageColor
+   * @description Returns a color name based on resource usage percentage.
+   * Used for progress bars (CPU, memory, disk).
+   * @param {number} usage - The usage percentage (0-100).
+   * @returns {'green' | 'orange' | 'red'} The color name.
+   */
+  const getUsageColor = (usage: number): 'green' | 'orange' | 'red' => {
+    if (usage >= 90) return 'red';
+    if (usage >= 70) return 'orange';
+    return 'green';
+  };
 
-  const formatUptime = (hours: number) => {
-    if (hours < 24) return `${hours}h`
-    const days = Math.floor(hours / 24)
-    const remainingHours = hours % 24
-    return `${days}d ${remainingHours}h`
-  }
+  /**
+   * @function formatUptime
+   * @description Formats uptime from hours into a human-readable string (e.g., "Xd Yh").
+   * @param {number} hours - The uptime in hours.
+   * @returns {string} The formatted uptime string.
+   */
+  const formatUptime = (hours: number): string => {
+    if (hours < 0) return 'N/A'; // Handle potential negative or invalid uptime
+    if (hours < 24) return `${hours}h`;
+    const days = Math.floor(hours / 24);
+    const remainingHours = hours % 24;
+    return `${days}d ${remainingHours}h`;
+  };
 
+  // --- Action Handlers (placeholders, show toasts for now) ---
+  /**
+   * @function handleRestart
+   * @description Placeholder to simulate restarting a system. Shows a toast.
+   * @param {System} system - The system to restart.
+   */
   const handleRestart = (system: System) => {
+    // TODO: Implement actual restart logic (e.g., API call)
     showToast({
       type: 'info',
-      title: 'Restart initiated',
-      description: `Restarting ${system.name}...`
-    })
-  }
+      title: 'Restart Initiated',
+      description: `Restarting system: ${system.name} (${system.ipAddress})...`
+    });
+  };
 
+  /**
+   * @function handleViewLogs
+   * @description Placeholder to simulate viewing logs for a system. Shows a toast.
+   * @param {System} system - The system whose logs to view.
+   */
   const handleViewLogs = (system: System) => {
+    // TODO: Implement logic to navigate to or display logs
     showToast({
       type: 'info',
-      title: 'Opening logs',
-      description: `Viewing logs for ${system.name}`
-    })
-  }
+      title: 'Opening Logs',
+      description: `Viewing logs for system: ${system.name}.`
+    });
+  };
 
+  /**
+   * @function handleSendAlert
+   * @description Placeholder to simulate sending an alert for a system. Shows a toast.
+   * @param {System} system - The system to send an alert for.
+   */
   const handleSendAlert = (system: System) => {
+    // TODO: Implement actual alert sending logic
     showToast({
       type: 'success',
-      title: 'Alert sent',
-      description: `Alert sent to administrators for ${system.name}`
-    })
-  }
+      title: 'Alert Sent',
+      description: `Alert dispatched for system: ${system.name}.`
+    });
+  };
 
-  const onlineCount = systems.filter(s => s.status === 'online').length
-  const offlineCount = systems.filter(s => s.status === 'offline').length
-  const warningCount = systems.filter(s => s.status === 'warning').length
-  const totalAlerts = systems.reduce((sum, s) => sum + s.alerts, 0)
+  // --- Derived Data for Summary Cards ---
+  const onlineCount = filteredSystems.filter(s => s.status === 'online').length;
+  const offlineCount = filteredSystems.filter(s => s.status === 'offline').length;
+  const warningCount = filteredSystems.filter(s => s.status === 'warning').length;
+  const totalAlerts = filteredSystems.reduce((sum, s) => sum + s.alerts, 0);
 
   return (
     <Box>

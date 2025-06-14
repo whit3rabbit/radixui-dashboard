@@ -1,21 +1,40 @@
+/**
+ * @file ForgotPassword.tsx
+ * @description This file defines the Forgot Password page component.
+ * It allows users to enter their email address to receive a password reset link.
+ * It includes form validation, handles submission state (loading, submitted), and provides user feedback.
+ */
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Container, Card, Flex, Heading, Text, TextField, Button, Box, IconButton, Callout } from '@radix-ui/themes'
 import { EnvelopeClosedIcon, SunIcon, MoonIcon, ArrowLeftIcon, CheckCircledIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons'
 import { useTheme } from '../../lib/theme-context'
-import { validateEmail } from '../../lib/validation'
+import { validateEmail } from '../../lib/validation' // Email validation utility
 
+/**
+ * @function ForgotPassword
+ * @description A component that renders the forgot password page.
+ * It includes a form for users to submit their email address.
+ * On submission, it simulates an API call and then displays a confirmation message.
+ * @returns {JSX.Element} The rendered Forgot Password page.
+ */
 export default function ForgotPassword() {
-  const { theme, toggleTheme } = useTheme()
-  const [email, setEmail] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { theme, toggleTheme } = useTheme() // Theme context for toggling light/dark mode
+  const [email, setEmail] = useState('') // State for the email input
+  const [isLoading, setIsLoading] = useState(false) // State to manage loading status during submission
+  const [isSubmitted, setIsSubmitted] = useState(false) // State to track if the form has been successfully submitted
+  const [error, setError] = useState<string | null>(null) // State for storing form validation errors
 
+  /**
+   * @function handleSubmit
+   * @description Handles the form submission for requesting a password reset.
+   * It validates the email, simulates an API call, and updates the UI state accordingly.
+   * @param {React.FormEvent} e - The form submission event.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    const emailError = validateEmail(email)
+    e.preventDefault() // Prevent default form submission
+
+    const emailError = validateEmail(email) // Validate the entered email
     if (emailError) {
       setError(emailError)
       return

@@ -1,65 +1,109 @@
+/**
+ * @file ResetPassword.tsx
+ * @description This file defines the Reset Password page component.
+ * It allows users to set a new password after verifying a reset token
+ * (typically received via email). It includes form validation for the new password,
+ * password strength indication, and handles the reset submission process.
+ */
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Container, Card, Flex, Heading, Text, TextField, Button, Box, IconButton, Callout } from '@radix-ui/themes'
 import { LockClosedIcon, SunIcon, MoonIcon, EyeOpenIcon, EyeClosedIcon, CheckCircledIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons'
 import { useTheme } from '../../lib/theme-context'
-import { validatePassword, validatePasswordMatch } from '../../lib/validation'
-import PasswordStrengthIndicator from '../../components/PasswordStrengthIndicator'
+import { validatePassword, validatePasswordMatch } from '../../lib/validation' // Validation utilities
+import PasswordStrengthIndicator from '../../components/PasswordStrengthIndicator' // Component for password strength
 
+/**
+ * @typedef ResetPasswordFormData
+ * @description Defines the structure for the reset password form data.
+ * @property {string} password - The new password.
+ * @property {string} confirmPassword - Confirmation of the new password.
+ */
+type ResetPasswordFormData = {
+  password: string;
+  confirmPassword: string;
+};
+
+/**
+ * @typedef ResetPasswordErrors
+ * @description Defines the structure for storing reset password form errors.
+ * @property {string} [password] - Error message for the password field.
+ * @property {string} [confirmPassword] - Error message for the confirm password field.
+ * @property {string} [general] - General error message (e.g., invalid token).
+ */
+type ResetPasswordErrors = {
+  password?: string;
+  confirmPassword?: string;
+  general?: string;
+};
+
+/**
+ * @function ResetPassword
+ * @description A component that renders the reset password page.
+ * It includes a form for users to enter and confirm their new password.
+ * It validates the input, checks for a reset token in the URL,
+ * simulates an API call for resetting the password, and then displays a success message
+ * before redirecting to the login page.
+ * @returns {JSX.Element} The rendered Reset Password page.
+ */
 export default function ResetPassword() {
-  const { theme, toggleTheme } = useTheme()
-  const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-  const token = searchParams.get('token')
-  
-  const [formData, setFormData] = useState({
-    password: '',
-    confirmPassword: ''
-  })
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [errors, setErrors] = useState<{
-    password?: string;
-    confirmPassword?: string;
-    general?: string;
-  }>({})
+  const { theme, toggleTheme } = useTheme(); // Theme context for light/dark mode
+  const navigate = useNavigate(); // React Router hook for navigation
+  const [searchParams] = useSearchParams(); // Hook to access URL query parameters
+  const token = searchParams.get('token'); // Get the reset token from the URL
 
+  const [formData, setFormData] = useState<ResetPasswordFormData>({
+    password: '',
+    confirmPassword: '',
+  });
+  const [showPassword, setShowPassword] = useState(false); // Toggle visibility for new password
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Toggle visibility for confirm new password
+  const [isLoading, setIsLoading] = useState(false); // Manage loading state during submission
+  const [isSubmitted, setIsSubmitted] = useState(false); // Track if the form has been successfully submitted
+  const [errors, setErrors] = useState<ResetPasswordErrors>({}); // Store form validation errors
+
+  /**
+   * @function handleSubmit
+   * @description Handles the form submission for resetting the password.
+   * It validates the new password and confirmation, checks for the presence of a token,
+   * simulates an API call, and updates UI state. Redirects to login on success.
+   * @param {React.FormEvent} e - The form submission event.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    const passwordError = validatePassword(formData.password)
-    const confirmPasswordError = validatePasswordMatch(formData.password, formData.confirmPassword)
-    
+    e.preventDefault(); // Prevent default form submission
+
+    const passwordError = validatePassword(formData.password);
+    const confirmPasswordError = validatePasswordMatch(formData.password, formData.confirmPassword);
+
     if (passwordError || confirmPasswordError) {
       setErrors({
         password: passwordError || undefined,
         confirmPassword: confirmPasswordError || undefined,
-      })
-      return
+      });
+      return; // Stop submission if validation fails
     }
-    
+
     if (!token) {
-      setErrors({ general: 'Invalid or expired reset link' })
-      return
+      setErrors({ general: 'Invalid or expired reset link. Please request a new one.' });
+      return; // Stop if no token is present
     }
-    
-    setErrors({})
-    setIsLoading(true)
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    setIsLoading(false)
-    setIsSubmitted(true)
-    
-    // Redirect to login after 3 seconds
+
+    setErrors({}); // Clear previous errors
+    setIsLoading(true); // Set loading state
+
+    // Simulate API call to reset password with the token
+    // In a real app: await authApi.resetPassword(token, formData.password);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    setIsLoading(false);
+    setIsSubmitted(true); // Show success message
+
+    // Redirect to login page after a delay
     setTimeout(() => {
-      navigate('/login')
-    }, 3000)
-  }
-  
+      navigate('/login');
+    }, 3000);
+  };
+
   return (
     <Container size="1" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
       {/* Theme Toggle */}

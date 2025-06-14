@@ -1,24 +1,32 @@
+/**
+ * @file auth-context.tsx
+ * @description This file defines the authentication context for the application.
+ * It includes the AuthProvider component, the useAuth hook, and a ProtectedRoute component.
+ * It manages user authentication state, provides login, register, logout, and profile update functionalities.
+ * A bypass mode (`BYPASS_AUTH`) is included for development to use a mock user without real authentication.
+ */
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { storage } from './secure-storage';
+import { storage } from './secure-storage'; // Assumes secure-storage handles token and user data persistence
 
 /**
- * AUTHENTICATION BYPASS MODE
- * 
- * Set to true to bypass login and use a mock user (default for development)
- * Set to false to require real authentication (needs database setup)
- * 
- * When true:
- * - Automatically logged in as "Demo User"
- * - No database required
- * - Perfect for UI development
- * 
- * When false:
- * - Real login required
- * - Must implement database (see docs/DATABASE_INTEGRATION.md)
+ * @const BYPASS_AUTH
+ * @description Global flag to enable or disable authentication bypass mode.
+ * When true, a mock user is used, and actual authentication logic is skipped.
+ * Ideal for UI development or when a backend is not available.
+ * Set to `false` for production or when testing real authentication flows.
+ * @default true
  */
 const BYPASS_AUTH = true;
 
+/**
+ * @interface User
+ * @description Defines the structure of a user object.
+ * @property {string} id - Unique identifier for the user.
+ * @property {string} email - User's email address.
+ * @property {string} name - User's full name or display name.
+ * @property {string} [avatar] - URL to the user's avatar image.
+ */
 interface User {
   id: string;
   email: string;
@@ -26,6 +34,17 @@ interface User {
   avatar?: string;
 }
 
+/**
+ * @interface AuthContextType
+ * @description Defines the shape of the authentication context.
+ * @property {User | null} user - The current authenticated user object, or null if not authenticated.
+ * @property {boolean} isAuthenticated - True if the user is authenticated, false otherwise.
+ * @property {boolean} isLoading - True if the authentication state is currently being determined (e.g., on initial load or during login).
+ * @property {(email: string, password: string) => Promise<{ success: boolean; error?: string }>} login - Function to attempt user login.
+ * @property {(email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>} register - Function to register a new user.
+ * @property {() => void} logout - Function to log out the current user.
+ * @property {(updates: Partial<User>) => Promise<{ success: boolean; error?: string }>} updateProfile - Function to update the current user's profile.
+ */
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
@@ -36,18 +55,34 @@ interface AuthContextType {
   updateProfile: (updates: Partial<User>) => Promise<{ success: boolean; error?: string }>;
 }
 
+/**
+ * @const AuthContext
+ * @description React context for authentication.
+ */
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock user for development when auth is bypassed
+/**
+ * @const MOCK_USER
+ * @description A predefined mock user object used when `BYPASS_AUTH` is true.
+ */
 const MOCK_USER: User = {
   id: '1',
   email: 'demo@example.com',
   name: 'Demo User',
 };
 
+/**
+ * @function AuthProvider
+ * @description Provides the authentication context to its children.
+ * It manages user state, authentication logic (login, logout, register, profile updates),
+ * and handles session persistence (if not in bypass mode).
+ * @param {{ children: ReactNode }} props - Props for the component.
+ * @property {ReactNode} children - The child components to be wrapped by the provider.
+ * @returns {JSX.Element} The AuthProvider component.
+ */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(BYPASS_AUTH ? MOCK_USER : null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // True initially to check session
   const navigate = useNavigate();
 
   // Check for existing session on mount
@@ -225,9 +260,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const value = {
+  // Value provided by the context
+  const value: AuthContextType = {
     user,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user, // True if user object exists
     isLoading,
     login,
     register,
@@ -238,8 +274,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+/**
+ * @function useAuth
+ * @description Custom hook to access the authentication context.
+ * Throws an error if used outside of an `AuthProvider`.
+ * @returns {AuthContextType} The authentication context.
+ */
 // eslint-disable-next-line react-refresh/only-export-components
-export function useAuth() {
+export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
@@ -247,11 +289,23 @@ export function useAuth() {
   return context;
 }
 
-// Protected Route Component
+/**
+ * @interface ProtectedRouteProps
+ * @description Defines the props for the ProtectedRoute component.
+ * @property {ReactNode} children - The child components to render if the user is authenticated.
+ */
 interface ProtectedRouteProps {
   children: ReactNode;
 }
 
+/**
+ * @function ProtectedRoute
+ * @description A component that guards routes requiring authentication.
+ * If the user is not authenticated, it redirects them to the login page.
+ * It also handles the loading state, showing nothing or a spinner until authentication status is confirmed.
+ * @param {ProtectedRouteProps} props - The props for the component.
+ * @returns {ReactNode | null} The child components if authenticated, or null/redirects otherwise.
+ */
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();

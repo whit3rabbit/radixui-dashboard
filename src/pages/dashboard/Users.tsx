@@ -1,8 +1,16 @@
+/**
+ * @file Users.tsx
+ * @description This file defines the User Management page component for the dashboard.
+ * It provides a tabbed interface for managing users, roles, permissions, and viewing activity logs.
+ * Features include listing users with filtering, bulk actions, creating/editing users via dialogs,
+ * and displaying roles with their associated permissions.
+ * All data and some functionalities (like activity log) are currently mocked.
+ */
 import { useState } from 'react'
-import { 
-  Box, 
-  Card, 
-  Flex, 
+import {
+  Box,
+  Card,
+  Flex,
   Heading, 
   Text, 
   Button, 
@@ -27,31 +35,72 @@ import {
   ActivityLogIcon,
   CheckCircledIcon
 } from '@radix-ui/react-icons'
-import DataTable from '../../components/DataTable'
-import { useToast } from '../../components/notifications/toast-context'
+// Note: DropdownMenu is already imported from @radix-ui/themes in the main block.
+// Redundant import at the end of the original file will be removed.
+import DataTable from '../../components/DataTable' // Reusable DataTable component
+import { useToast } from '../../components/notifications/toast-context' // For toast notifications
 
+/**
+ * @typedef {'admin' | 'moderator' | 'user'} UserRole
+ * @description Represents the possible roles a user can have.
+ */
+type UserRole = 'admin' | 'moderator' | 'user';
+
+/**
+ * @typedef {'active' | 'inactive' | 'suspended'} UserStatus
+ * @description Represents the possible statuses of a user account.
+ */
+type UserStatus = 'active' | 'inactive' | 'suspended';
+
+/**
+ * @interface User
+ * @description Defines the structure of a user object.
+ * @property {string} id - Unique identifier for the user.
+ * @property {string} name - Full name of the user.
+ * @property {string} email - Email address of the user.
+ * @property {UserRole} role - The role assigned to the user.
+ * @property {string} department - The department the user belongs to.
+ * @property {UserStatus} status - Current status of the user's account.
+ * @property {string} [avatar] - URL to the user's avatar image.
+ * @property {Date} lastLogin - Date of the user's last login.
+ * @property {Date} createdAt - Date when the user account was created.
+ * @property {string[]} permissions - A list of permission strings assigned to the user (can be derived from role).
+ */
 interface User {
-  id: string
-  name: string
-  email: string
-  role: 'admin' | 'moderator' | 'user'
-  department: string
-  status: 'active' | 'inactive' | 'suspended'
-  avatar?: string
-  lastLogin: Date
-  createdAt: Date
-  permissions: string[]
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  department: string;
+  status: UserStatus;
+  avatar?: string;
+  lastLogin: Date;
+  createdAt: Date;
+  permissions: string[];
 }
 
+/**
+ * @interface Role
+ * @description Defines the structure of a user role object.
+ * @property {string} id - Unique identifier for the role.
+ * @property {string} name - Display name of the role (e.g., "Administrator").
+ * @property {string} description - A brief description of the role's purpose.
+ * @property {string[]} permissions - An array of permission strings associated with this role.
+ * @property {number} userCount - The number of users currently assigned to this role.
+ */
 interface Role {
-  id: string
-  name: string
-  description: string
-  permissions: string[]
-  userCount: number
+  id: string;
+  name: string;
+  description: string;
+  permissions: string[];
+  userCount: number;
 }
 
-// Mock data
+// TODO: Replace mockUsers, mockRoles, and allPermissions with actual data from an API or data source.
+/**
+ * @const mockUsers
+ * @description An array of mock user data for demonstration.
+ */
 const mockUsers: User[] = [
   {
     id: '1',
@@ -135,101 +184,166 @@ const mockRoles: Role[] = [
     permissions: ['profile.edit'],
     userCount: 2
   }
-]
+  // ... more mock roles
+];
 
+/**
+ * @const allPermissions
+ * @description A comprehensive list of all available permissions in the system,
+ * grouped by category. Used for displaying the permissions matrix.
+ */
 const allPermissions = [
-  { id: 'users.manage', name: 'Manage Users', category: 'Users' },
-  { id: 'users.view', name: 'View Users', category: 'Users' },
-  { id: 'billing.manage', name: 'Manage Billing', category: 'Billing' },
+  { id: 'users.manage', name: 'Manage Users (Create, Edit, Delete)', category: 'Users' },
+  { id: 'users.view', name: 'View User List and Profiles', category: 'Users' },
+  { id: 'billing.manage', name: 'Manage Subscriptions and Invoices', category: 'Billing' },
   { id: 'billing.view', name: 'View Billing', category: 'Billing' },
   { id: 'settings.manage', name: 'Manage Settings', category: 'Settings' },
   { id: 'content.manage', name: 'Manage Content', category: 'Content' },
   { id: 'content.view', name: 'View Content', category: 'Content' },
-  { id: 'profile.edit', name: 'Edit Own Profile', category: 'Profile' }
-]
+  { id: 'profile.edit', name: 'Edit Own Profile Details', category: 'Profile' }
+  // ... more permissions
+];
 
+/**
+ * @function Users
+ * @description The main component for the User Management page.
+ * It provides a tabbed interface for managing users and their roles/permissions,
+ * as well as viewing a mock activity log.
+ * @returns {JSX.Element} The rendered User Management page.
+ */
 export default function Users() {
-  const { showToast } = useToast()
-  const [users, setUsers] = useState<User[]>(mockUsers)
-  const [roles] = useState<Role[]>(mockRoles)
-  const [selectedUsers, setSelectedUsers] = useState<User[]>([])
-  const [showUserDialog, setShowUserDialog] = useState(false)
-  const [showBulkImport, setShowBulkImport] = useState(false)
-  const [editingUser, setEditingUser] = useState<User | null>(null)
-  const [activeTab, setActiveTab] = useState('users')
-  
-  // Filter states
-  const [roleFilter, setRoleFilter] = useState('all')
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [departmentFilter, setDepartmentFilter] = useState('all')
+  const { showToast } = useToast(); // Hook for displaying toast notifications
 
-  const handleCreateUser = (userData: Partial<User>) => {
-    const newUser: User = {
-      id: Date.now().toString(),
-      name: userData.name || '',
-      email: userData.email || '',
-      role: userData.role || 'user',
-      department: userData.department || '',
-      status: 'active',
-      lastLogin: new Date(),
-      createdAt: new Date(),
-      permissions: userData.permissions || ['profile.edit']
-    }
-    setUsers([...users, newUser])
-    setShowUserDialog(false)
-    showToast({
-      type: 'success',
-      title: 'User created',
-      description: `${newUser.name} has been added successfully`
-    })
-  }
+  // --- State Management ---
+  const [users, setUsers] = useState<User[]>(mockUsers); // List of all users
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [roles, _setRoles] = useState<Role[]>(mockRoles); // List of all roles (_setRoles would be used if roles are editable)
+  const [selectedUsers, setSelectedUsers] = useState<User[]>([]); // Users selected in the DataTable for bulk actions
+  const [showUserDialog, setShowUserDialog] = useState(false); // Controls visibility of the create/edit user dialog
+  const [showBulkImport, setShowBulkImport] = useState(false); // Controls visibility of the bulk import dialog
+  const [editingUser, setEditingUser] = useState<User | null>(null); // Stores the user being edited, or null if creating
+  const [activeTab, setActiveTab] = useState('users'); // Currently active tab ('users', 'roles', 'activity')
 
+  // Filter states for the users table
+  const [roleFilter, setRoleFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [departmentFilter, setDepartmentFilter] = useState('all');
 
-  const handleDeleteUser = (userId: string) => {
-    setUsers(users.filter(user => user.id !== userId))
-    showToast({
-      type: 'success',
-      title: 'User deleted',
-      description: 'User has been removed from the system'
-    })
-  }
+  // --- User CRUD and Bulk Action Handlers ---
 
-  const handleBulkDelete = () => {
-    const idsToDelete = selectedUsers.map(u => u.id)
-    setUsers(users.filter(user => !idsToDelete.includes(user.id)))
-    setSelectedUsers([])
-    showToast({
-      type: 'success',
-      title: 'Users deleted',
-      description: `${idsToDelete.length} users have been removed`
-    })
-  }
-
-  const handleBulkRoleChange = (newRole: User['role']) => {
-    const idsToUpdate = selectedUsers.map(u => u.id)
-    setUsers(users.map(user => 
-      idsToUpdate.includes(user.id) ? { ...user, role: newRole } : user
-    ))
-    setSelectedUsers([])
-    showToast({
-      type: 'success',
-      title: 'Roles updated',
-      description: `Updated role for ${idsToUpdate.length} users`
-    })
-  }
-
-  const formatDate = (date: Date) => {
-    const now = new Date()
-    const diff = now.getTime() - date.getTime()
-    const hours = Math.floor(diff / 3600000)
-    
-    if (hours < 24) {
-      return `${hours}h ago`
+  /**
+   * @function handleCreateOrUpdateUser
+   * @description Handles creation or update of a user.
+   * If `editingUser` is present, it updates that user; otherwise, creates a new user.
+   * Data is taken from a form (not explicitly passed here, assumes form state is read within).
+   * Shows a toast notification on success.
+   * @param {Partial<User>} userData - The user data from the form. For new users, some fields might be defaulted.
+   */
+  const handleCreateOrUpdateUser = (userData: Partial<User>) => {
+    // This function would typically take data from a form state within the dialog.
+    // For simplicity, using passed userData and some defaults.
+    if (editingUser) {
+      // Update existing user
+      setUsers(users.map(u => u.id === editingUser.id ? { ...u, ...userData, updatedAt: new Date() } : u));
+      showToast({ type: 'success', title: 'User updated', description: `${userData.name || editingUser.name} has been updated.` });
     } else {
-      return date.toLocaleDateString()
+      // Create new user
+      const newUser: User = {
+        id: Date.now().toString(), // Simple ID for mock
+        name: userData.name || 'New User',
+        email: userData.email || `newuser${Date.now()}@example.com`,
+        role: userData.role || 'user',
+        department: userData.department || 'Unassigned',
+        status: 'active',
+        lastLogin: new Date(),
+        createdAt: new Date(),
+        permissions: userData.permissions || ['profile.edit'],
+        avatar: userData.avatar
+      };
+      setUsers([...users, newUser]);
+      showToast({ type: 'success', title: 'User created', description: `${newUser.name} has been added.` });
     }
-  }
+    setShowUserDialog(false); // Close dialog
+    setEditingUser(null); // Reset editing state
+  };
+  // Note: The original `handleCreateUser` was more specific.
+  // The above `handleCreateOrUpdateUser` is a common pattern for combined dialogs.
+  // If keeping separate, ensure `handleUpdateUser` is also defined.
+  // For now, I'll adapt the dialog's save button to call this or a similar combined function.
 
+  /**
+   * @function handleDeleteUser
+   * @description Deletes a user by their ID. Shows a toast notification.
+   * @param {string} userId - The ID of the user to delete.
+   */
+  const handleDeleteUser = (userId: string) => {
+    // TODO: Add confirmation dialog before actual deletion
+    setUsers(users.filter(user => user.id !== userId));
+    showToast({
+      type: 'success',
+      title: 'User Deleted',
+      description: 'The user has been removed from the system.'
+    });
+  };
+
+  /**
+   * @function handleBulkDelete
+   * @description Deletes all users currently selected in `selectedUsers`. Shows a toast.
+   */
+  const handleBulkDelete = () => {
+    // TODO: Add confirmation dialog
+    const idsToDelete = selectedUsers.map(u => u.id);
+    setUsers(users.filter(user => !idsToDelete.includes(user.id)));
+    setSelectedUsers([]); // Clear selection
+    showToast({
+      type: 'success',
+      title: 'Users Deleted',
+      description: `${idsToDelete.length} user(s) have been removed.`
+    });
+  };
+
+  /**
+   * @function handleBulkRoleChange
+   * @description Changes the role for all users currently selected in `selectedUsers`. Shows a toast.
+   * @param {UserRole} newRole - The new role to assign to the selected users.
+   */
+  const handleBulkRoleChange = (newRole: UserRole) => {
+    const idsToUpdate = selectedUsers.map(u => u.id);
+    setUsers(users.map(user =>
+      idsToUpdate.includes(user.id) ? { ...user, role: newRole, updatedAt: new Date() } : user
+    ));
+    setSelectedUsers([]); // Clear selection
+    showToast({
+      type: 'success',
+      title: 'Roles Updated',
+      description: `Updated role to "${newRole}" for ${idsToUpdate.length} user(s).`
+    });
+  };
+
+  // --- Helper Functions ---
+  /**
+   * @function formatDate
+   * @description Formats a date for display, showing relative time for recent dates.
+   * @param {Date} date - The date to format.
+   * @returns {string} The formatted date string (e.g., "Xh ago" or "MM/DD/YYYY").
+   */
+  const formatDate = (date: Date): string => {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / 3600000); // milliseconds to hours
+
+    if (diffHours < 24 && diffHours >= 0) { // Check for non-negative diffHours
+      return `${diffHours}h ago`;
+    } else {
+      return date.toLocaleDateString(); // Use local date format
+    }
+  };
+
+  // --- DataTable Configuration ---
+  /**
+   * @const userColumns
+   * @description Configuration for the columns in the Users DataTable.
+   */
   const userColumns = [
     {
       key: 'user',
@@ -281,12 +395,19 @@ export default function Users() {
       sortable: true,
       render: (value: Date) => formatDate(value)
     }
-  ]
+  ]; // Added semicolon here
 
-  const userActions = (user: User) => (
+  /**
+   * @function userActions
+   * @description A function that returns JSX for the actions column in the Users DataTable.
+   * This includes options to edit, view activity, reset password, and delete the user.
+   * @param {User} user - The user object for the current row.
+   * @returns {JSX.Element} The actions dropdown menu for the user.
+   */
+  const userActions = (user: User): JSX.Element => (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger>
-        <IconButton size="1" variant="ghost">
+        <IconButton size="1" variant="ghost"> {/* Radix IconButton */}
           <DotsHorizontalIcon />
         </IconButton>
       </DropdownMenu.Trigger>
@@ -612,7 +733,14 @@ export default function Users() {
             <Dialog.Close>
               <Button variant="soft" color="gray">Cancel</Button>
             </Dialog.Close>
-            <Button onClick={() => handleCreateUser({ name: 'New User', email: 'new@example.com' })}>
+            <Button onClick={() => handleCreateOrUpdateUser({
+              // Example: data could be sourced from a more robust form state solution
+              name: (document.querySelector('input[placeholder="Enter full name"]') as HTMLInputElement)?.value || editingUser?.name || '',
+              email: (document.querySelector('input[placeholder="Enter email address"]') as HTMLInputElement)?.value || editingUser?.email || '',
+              // Role and department would also be sourced from form state
+              role: editingUser?.role || 'user', // Placeholder
+              department: editingUser?.department || 'Unassigned' // Placeholder
+            })}>
               {editingUser ? 'Save Changes' : 'Create User'}
             </Button>
           </Flex>
@@ -672,5 +800,5 @@ export default function Users() {
   )
 }
 
-// Add missing import
-import { DropdownMenu } from '@radix-ui/themes'
+// Redundant import removed: import { DropdownMenu } from '@radix-ui/themes'
+// It's already included in the main import block from '@radix-ui/themes'.

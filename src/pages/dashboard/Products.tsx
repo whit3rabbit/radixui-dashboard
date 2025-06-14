@@ -1,8 +1,16 @@
+/**
+ * @file Products.tsx
+ * @description This file defines the Products page component for the dashboard.
+ * It allows users to manage their product catalog, including viewing, adding,
+ * editing, and deleting products. It features a DataTable for displaying products
+ * and dialogs for create/edit/delete operations.
+ * All data displayed is currently mock data.
+ */
 import { useState } from 'react'
-import { 
-  Box, 
-  Heading, 
-  Flex, 
+import {
+  Box,
+  Heading,
+  Flex,
   Button, 
   Dialog,
   TextField,
@@ -23,22 +31,46 @@ import {
   CopyIcon,
   EyeOpenIcon
 } from '@radix-ui/react-icons'
-import DataTable from '../../components/DataTable'
+import DataTable from '../../components/DataTable' // Reusable DataTable component
 
+/**
+ * @typedef {'active' | 'draft' | 'archived'} ProductStatus
+ * @description Represents the possible statuses of a product.
+ */
+type ProductStatus = 'active' | 'draft' | 'archived';
+
+/**
+ * @interface Product
+ * @description Defines the structure of a product object.
+ * @property {string} id - Unique identifier for the product.
+ * @property {string} name - Name of the product.
+ * @property {string} sku - Stock Keeping Unit for the product.
+ * @property {string} category - Category the product belongs to.
+ * @property {number} price - Price of the product.
+ * @property {number} stock - Current stock quantity of the product.
+ * @property {ProductStatus} status - Current status of the product (e.g., 'active', 'draft').
+ * @property {string} [description] - Optional detailed description of the product.
+ * @property {string} createdAt - ISO date string representing when the product was created.
+ * @property {string} updatedAt - ISO date string representing when the product was last updated.
+ */
 interface Product {
-  id: string
-  name: string
-  sku: string
-  category: string
-  price: number
-  stock: number
-  status: 'active' | 'draft' | 'archived'
-  description?: string
-  createdAt: string
-  updatedAt: string
+  id: string;
+  name: string;
+  sku: string;
+  category: string;
+  price: number;
+  stock: number;
+  status: ProductStatus;
+  description?: string;
+  createdAt: string; // Should ideally be Date object or ISO string
+  updatedAt: string; // Should ideally be Date object or ISO string
 }
 
-// Mock data
+// TODO: Replace mockProducts with actual data fetched from an API or data source.
+/**
+ * @const mockProducts
+ * @description An array of mock product data used for demonstration purposes.
+ */
 const mockProducts: Product[] = [
   {
     id: '1',
@@ -151,27 +183,62 @@ const mockProducts: Product[] = [
     createdAt: '2024-03-05',
     updatedAt: '2024-03-20'
   }
+  // ... more mock products
 ]
 
+/**
+ * @typedef ProductFormData
+ * @description Defines the structure for the product form data (used for create/edit).
+ * Note: Price and stock are strings here due to input field behavior, conversion needed on submit.
+ * @property {string} name
+ * @property {string} sku
+ * @property {string} category
+ * @property {string} price
+ * @property {string} stock
+ * @property {ProductStatus} status
+ * @property {string} description
+ */
+type ProductFormData = {
+  name: string;
+  sku: string;
+  category: string;
+  price: string; // Input as string, parse to number on submit
+  stock: string; // Input as string, parse to number on submit
+  status: ProductStatus;
+  description: string;
+};
+
+/**
+ * @function Products
+ * @description The main component for the Products page.
+ * It displays a table of products and provides CRUD (Create, Read, Update, Delete) functionalities.
+ * Features include adding new products, editing existing ones, and deleting products,
+ * all managed through dialogs and a data table.
+ * @returns {JSX.Element} The rendered Products page.
+ */
 export default function Products() {
-  const [products, setProducts] = useState<Product[]>(mockProducts)
-  const [isCreateOpen, setIsCreateOpen] = useState(false)
-  const [isEditOpen, setIsEditOpen] = useState(false)
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
-  const [selectedRows, setSelectedRows] = useState<Product[]>([])
-  
-  // Form state
-  const [formData, setFormData] = useState({
+  const [products, setProducts] = useState<Product[]>(mockProducts); // Holds the list of products
+  const [isCreateOpen, setIsCreateOpen] = useState(false); // Controls visibility of the create product dialog
+  const [isEditOpen, setIsEditOpen] = useState(false); // Controls visibility of the edit product dialog
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false); // Controls visibility of the delete confirmation dialog
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null); // Stores the product selected for editing or deletion
+  const [selectedRows, setSelectedRows] = useState<Product[]>([]); // Stores rows selected in DataTable for bulk actions
+
+  // State for the form data in create/edit dialogs
+  const [formData, setFormData] = useState<ProductFormData>({
     name: '',
     sku: '',
     category: '',
     price: '',
     stock: '',
-    status: 'active' as Product['status'],
+    status: 'active', // Default status for new products
     description: ''
-  })
+  });
 
+  /**
+   * @const columns
+   * @description Configuration for the columns in the DataTable displaying products.
+   */
   const columns = [
     {
       key: 'name',
@@ -245,9 +312,17 @@ export default function Products() {
     }
   ]
 
+  /**
+   * @function handleCreate
+   * @description Handles the creation of a new product.
+   * It takes the current `formData`, adds a new product to the `products` state,
+   * closes the create dialog, and resets the form.
+   * In a real app, this would involve an API call.
+   */
   const handleCreate = () => {
+    // TODO: Add validation for formData before creating.
     const newProduct: Product = {
-      id: String(Date.now()),
+      id: String(Date.now()), // Simple ID generation for mock data
       name: formData.name,
       sku: formData.sku,
       category: formData.category,
@@ -263,42 +338,65 @@ export default function Products() {
     resetForm()
   }
 
+  /**
+   * @function handleEdit
+   * @description Handles editing an existing product.
+   * It updates the product in the `products` state based on `selectedProduct` and `formData`,
+   * closes the edit dialog, and resets the form.
+   * In a real app, this would involve an API call.
+   */
   const handleEdit = () => {
-    if (!selectedProduct) return
-    
-    setProducts(products.map(product => 
-      product.id === selectedProduct.id 
-        ? { 
-            ...product, 
+    if (!selectedProduct) return;
+    // TODO: Add validation for formData before editing.
+    setProducts(products.map(product =>
+      product.id === selectedProduct.id
+        ? {
+            ...product,
             name: formData.name,
             sku: formData.sku,
             category: formData.category,
-            price: parseFloat(formData.price),
-            stock: parseInt(formData.stock),
+            price: parseFloat(formData.price) || 0, // Ensure price is a number
+            stock: parseInt(formData.stock) || 0,   // Ensure stock is a number
             status: formData.status,
             description: formData.description,
-            updatedAt: new Date().toISOString().split('T')[0]
+            updatedAt: new Date().toISOString().split('T')[0] // Update timestamp
           }
         : product
-    ))
-    setIsEditOpen(false)
-    resetForm()
-  }
+    ));
+    setIsEditOpen(false);
+    resetForm();
+  };
 
+  /**
+   * @function handleDelete
+   * @description Handles the deletion of a single product.
+   * It removes the `selectedProduct` from the `products` state and closes the delete dialog.
+   * In a real app, this would involve an API call.
+   */
   const handleDelete = () => {
-    if (!selectedProduct) return
-    
-    setProducts(products.filter(product => product.id !== selectedProduct.id))
-    setIsDeleteOpen(false)
-    setSelectedProduct(null)
-  }
+    if (!selectedProduct) return;
+    setProducts(products.filter(product => product.id !== selectedProduct.id));
+    setIsDeleteOpen(false);
+    setSelectedProduct(null); // Clear selected product
+  };
 
+  /**
+   * @function handleBulkDelete
+   * @description Handles the deletion of multiple products selected in the DataTable.
+   * It filters out the selected products from the `products` state.
+   * In a real app, this would involve multiple API calls or a bulk delete API endpoint.
+   */
   const handleBulkDelete = () => {
-    const selectedIds = new Set(selectedRows.map(row => row.id))
-    setProducts(products.filter(product => !selectedIds.has(product.id)))
-    setSelectedRows([])
-  }
+    const selectedIds = new Set(selectedRows.map(row => row.id));
+    setProducts(products.filter(product => !selectedIds.has(product.id)));
+    setSelectedRows([]); // Clear selection
+  };
 
+  /**
+   * @function resetForm
+   * @description Resets the `formData` state to its initial empty/default values
+   * and clears the `selectedProduct`. Used after create/edit operations.
+   */
   const resetForm = () => {
     setFormData({
       name: '',
@@ -308,30 +406,47 @@ export default function Products() {
       stock: '',
       status: 'active',
       description: ''
-    })
-    setSelectedProduct(null)
-  }
+    });
+    setSelectedProduct(null);
+  };
 
+  /**
+   * @function openEditDialog
+   * @description Opens the edit product dialog and populates the form with the selected product's data.
+   * @param {Product} product - The product to be edited.
+   */
   const openEditDialog = (product: Product) => {
-    setSelectedProduct(product)
+    setSelectedProduct(product);
     setFormData({
       name: product.name,
       sku: product.sku,
       category: product.category,
-      price: product.price.toString(),
-      stock: product.stock.toString(),
+      price: product.price.toString(), // Convert number to string for input field
+      stock: product.stock.toString(), // Convert number to string for input field
       status: product.status,
-      description: product.description || ''
-    })
-    setIsEditOpen(true)
-  }
+      description: product.description || '' // Handle potentially undefined description
+    });
+    setIsEditOpen(true);
+  };
 
+  /**
+   * @function openDeleteDialog
+   * @description Opens the delete confirmation dialog for the selected product.
+   * @param {Product} product - The product to be deleted.
+   */
   const openDeleteDialog = (product: Product) => {
-    setSelectedProduct(product)
-    setIsDeleteOpen(true)
-  }
+    setSelectedProduct(product);
+    setIsDeleteOpen(true);
+  };
 
-  const actions = (product: Product) => (
+  /**
+   * @function actions
+   * @description A function that returns JSX for the actions column in the DataTable
+   * for each product row (e.g., Edit, Delete buttons).
+   * @param {Product} product - The product object for the current row.
+   * @returns {JSX.Element} The actions dropdown menu for the product.
+   */
+  const actions = (product: Product): JSX.Element => (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger>
         <IconButton variant="ghost" size="2">
@@ -339,7 +454,7 @@ export default function Products() {
         </IconButton>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
-        <DropdownMenu.Item>
+        <DropdownMenu.Item onClick={() => alert(`Viewing details for ${product.name}`)}> {/* Placeholder for actual view */}
           <EyeOpenIcon />
           View Details
         </DropdownMenu.Item>
@@ -347,7 +462,7 @@ export default function Products() {
           <Pencil1Icon />
           Edit
         </DropdownMenu.Item>
-        <DropdownMenu.Item>
+        <DropdownMenu.Item onClick={() => alert(`Duplicating ${product.name}`)}> {/* Placeholder for duplicate action */}
           <CopyIcon />
           Duplicate
         </DropdownMenu.Item>
@@ -358,9 +473,13 @@ export default function Products() {
         </DropdownMenu.Item>
       </DropdownMenu.Content>
     </DropdownMenu.Root>
-  )
+  );
 
-  const categories = ['Electronics', 'Footwear', 'Accessories', 'Sports', 'Appliances', 'Furniture']
+  /**
+   * @const categories
+   * @description A list of available product categories for the select dropdown in forms.
+   */
+  const categories = ['Electronics', 'Footwear', 'Accessories', 'Sports', 'Appliances', 'Furniture', 'Books', 'Clothing'];
 
   return (
     <Box>

@@ -1,30 +1,67 @@
+/**
+ * @file Transactions.tsx
+ * @description This file defines the Transactions page component for the dashboard.
+ * It displays a list of financial transactions, provides filtering options,
+ * summary statistics, and actions like exporting or sharing transaction reports.
+ * All data displayed is currently mock data.
+ */
 import { useState } from 'react'
 import { Box, Card, Flex, Heading, Text, Badge, Button, TextField, Select, Dialog, Checkbox, Grid } from '@radix-ui/themes'
-import { 
-  ArrowUpIcon, 
-  ArrowDownIcon, 
+import {
+  ArrowUpIcon,
+  ArrowDownIcon,
   ArrowRightIcon,
   CalendarIcon,
   Share1Icon,
   DownloadIcon
 } from '@radix-ui/react-icons'
-import DataTable from '../../components/DataTable'
-import { useToast } from '../../components/notifications/toast-context'
+import DataTable from '../../components/DataTable' // Reusable DataTable component
+import { useToast } from '../../components/notifications/toast-context' // For toast notifications
 
+/**
+ * @typedef {'deposit' | 'withdrawal' | 'transfer'} TransactionType
+ * @description Represents the type of a financial transaction.
+ */
+type TransactionType = 'deposit' | 'withdrawal' | 'transfer';
+
+/**
+ * @typedef {'completed' | 'pending' | 'failed'} TransactionStatus
+ * @description Represents the status of a financial transaction.
+ */
+type TransactionStatus = 'completed' | 'pending' | 'failed';
+
+/**
+ * @interface Transaction
+ * @description Defines the structure of a transaction object.
+ * @property {string} id - Unique identifier for the transaction.
+ * @property {Date} date - Date and time of the transaction.
+ * @property {string} description - A brief description of the transaction.
+ * @property {TransactionType} type - The type of transaction (e.g., 'deposit', 'withdrawal').
+ * @property {number} amount - The monetary value of the transaction.
+ * @property {TransactionStatus} status - The current status of the transaction.
+ * @property {string} from - The source account or entity.
+ * @property {string} to - The destination account or entity.
+ * @property {string} reference - A reference number or code for the transaction.
+ * @property {string} category - Category of the transaction (e.g., 'Income', 'Housing').
+ */
 interface Transaction {
-  id: string
-  date: Date
-  description: string
-  type: 'deposit' | 'withdrawal' | 'transfer'
-  amount: number
-  status: 'completed' | 'pending' | 'failed'
-  from: string
-  to: string
-  reference: string
-  category: string
+  id: string;
+  date: Date;
+  description: string;
+  type: TransactionType;
+  amount: number;
+  status: TransactionStatus;
+  from: string;
+  to: string;
+  reference: string;
+  category: string;
 }
 
-// Mock data
+// TODO: Replace mockTransactions with actual data fetched from an API or data source.
+/**
+ * @const mockTransactions
+ * @description An array of mock transaction data used for demonstration purposes.
+ */
 const mockTransactions: Transaction[] = [
   {
     id: 'TXN001',
@@ -122,67 +159,119 @@ const mockTransactions: Transaction[] = [
     reference: 'REST-0609',
     category: 'Food & Dining'
   }
-]
+  // ... more mock transactions
+];
 
+/**
+ * @function Transactions
+ * @description The main component for the Transactions page.
+ * It displays a filterable and sortable table of financial transactions,
+ * summary statistics, and provides options for exporting and sharing reports.
+ * @returns {JSX.Element} The rendered Transactions page.
+ */
 export default function Transactions() {
-  const { showToast } = useToast()
-  const [transactions] = useState<Transaction[]>(mockTransactions)
-  const [dateRange, setDateRange] = useState('all')
-  const [typeFilter, setTypeFilter] = useState('all')
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [showShareDialog, setShowShareDialog] = useState(false)
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null)
+  const { showToast } = useToast(); // Hook for displaying toast notifications
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [transactions, _setTransactions] = useState<Transaction[]>(mockTransactions); // State for transactions, initialized with mock data.
+                                                                                // `_setTransactions` would be used if data can be updated/refetched.
+  // --- Filter States ---
+  const [dateRange, setDateRange] = useState('all'); // Filter by date range
+  const [typeFilter, setTypeFilter] = useState('all'); // Filter by transaction type
+  const [statusFilter, setStatusFilter] = useState('all'); // Filter by transaction status
+  // TODO: Add state for amount range filter if it needs to be controlled.
 
-  // Calculate summary stats
-  const totalTransactions = transactions.length
-  const totalVolume = transactions.reduce((sum, t) => sum + t.amount, 0)
-  const avgTransaction = totalVolume / totalTransactions
-  const successRate = (transactions.filter(t => t.status === 'completed').length / totalTransactions) * 100
+  // --- Dialog States ---
+  const [showShareDialog, setShowShareDialog] = useState(false); // Controls visibility of the share dialog
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null); // For transaction details dialog
 
-  const getTypeIcon = (type: Transaction['type']) => {
+  // --- Calculated Summary Statistics ---
+  // TODO: These calculations should ideally be memoized (e.g., with useMemo) if `transactions` can change frequently
+  // or if calculations are expensive, especially if filtering is client-side.
+  const totalTransactions = transactions.length;
+  const totalVolume = transactions.reduce((sum, t) => sum + t.amount, 0);
+  const avgTransaction = totalTransactions > 0 ? totalVolume / totalTransactions : 0;
+  const successRate = totalTransactions > 0 ? (transactions.filter(t => t.status === 'completed').length / totalTransactions) * 100 : 0;
+
+  /**
+   * @function getTypeIcon
+   * @description Returns an icon component based on the transaction type.
+   * @param {TransactionType} type - The type of the transaction.
+   * @returns {JSX.Element} The corresponding icon.
+   */
+  const getTypeIcon = (type: TransactionType): JSX.Element => {
     switch (type) {
       case 'deposit':
-        return <ArrowDownIcon />
+        return <ArrowDownIcon />; // Icon indicating money coming in
       case 'withdrawal':
-        return <ArrowUpIcon />
+        return <ArrowUpIcon />; // Icon indicating money going out
       case 'transfer':
-        return <ArrowRightIcon />
+        return <ArrowRightIcon />; // Icon indicating a transfer
+      default: // Should not happen with TransactionType
+        return <ArrowRightIcon />;
     }
-  }
+  };
 
-  const getStatusColor = (status: Transaction['status']) => {
+  /**
+   * @function getStatusColor
+   * @description Returns a color name (from Radix theme colors) based on transaction status.
+   * @param {TransactionStatus} status - The status of the transaction.
+   * @returns {'green' | 'orange' | 'red'} The color name.
+   */
+  const getStatusColor = (status: TransactionStatus): 'green' | 'orange' | 'red' => {
     switch (status) {
       case 'completed':
-        return 'green'
+        return 'green';
       case 'pending':
-        return 'orange'
+        return 'orange';
       case 'failed':
-        return 'red'
+        return 'red';
+      default:
+        return 'gray'; // Fallback, though status is typed
     }
-  }
+  };
 
+  /**
+   * @function handleExport
+   * @description Placeholder function to simulate exporting transaction data. Shows a toast.
+   * @param {'csv' | 'excel' | 'pdf'} format - The desired export format.
+   */
   const handleExport = (format: 'csv' | 'excel' | 'pdf') => {
+    // TODO: Implement actual export logic (e.g., generate file and trigger download)
     showToast({
       type: 'success',
       title: `Exporting to ${format.toUpperCase()}`,
-      description: 'Your file will be downloaded shortly'
-    })
-  }
+      description: 'Your transaction report will be downloaded shortly.'
+    });
+  };
 
+  /**
+   * @function handleShare
+   * @description Opens the share dialog.
+   */
   const handleShare = () => {
-    setShowShareDialog(true)
-  }
+    setShowShareDialog(true);
+  };
 
+  /**
+   * @function copyShareLink
+   * @description Simulates copying a share link to the clipboard and shows a toast.
+   */
   const copyShareLink = () => {
-    navigator.clipboard.writeText('https://dashboard.example.com/shared/transactions/abc123')
+    // TODO: Implement actual share link generation and copying
+    navigator.clipboard.writeText('https://dashboard.example.com/shared/transactions/mock-link-abc123xyz');
     showToast({
       type: 'success',
-      title: 'Link copied',
-      description: 'Share link has been copied to clipboard'
-    })
-    setShowShareDialog(false)
-  }
+      title: 'Link Copied',
+      description: 'A shareable link has been copied to your clipboard.'
+    });
+    setShowShareDialog(false); // Close dialog after copying
+  };
 
+  /**
+   * @const columns
+   * @description Configuration for the columns in the DataTable displaying transactions.
+   * Defines how each piece of transaction data is rendered.
+   */
   const columns = [
     {
       key: 'type',

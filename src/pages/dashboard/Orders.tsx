@@ -1,8 +1,15 @@
+/**
+ * @file Orders.tsx
+ * @description This file defines the Orders page component for the dashboard.
+ * It displays a list of customer orders using a DataTable, allowing users to
+ * view order details, update status, and perform other order-related actions.
+ * All data displayed is currently mock data.
+ */
 import { useState } from 'react'
-import { 
-  Box, 
-  Heading, 
-  Flex, 
+import {
+  Box,
+  Heading,
+  Flex,
   Button, 
   Dialog,
   Text,
@@ -23,32 +30,64 @@ import {
   CubeIcon as PackageIcon,
   ReloadIcon
 } from '@radix-ui/react-icons'
-import DataTable from '../../components/DataTable'
+import DataTable from '../../components/DataTable' // Reusable DataTable component
 
+/**
+ * @interface OrderItem
+ * @description Defines the structure for an individual item within an order.
+ * @property {string} id - Unique identifier for the order item.
+ * @property {string} name - Name of the product.
+ * @property {number} quantity - Number of units of this product in the order.
+ * @property {number} price - Price per unit of the product.
+ */
 interface OrderItem {
-  id: string
-  name: string
-  quantity: number
-  price: number
+  id: string;
+  name: string;
+  quantity: number;
+  price: number;
 }
 
+/**
+ * @typedef {'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'} OrderStatus
+ * @description Represents the possible statuses of an order.
+ */
+type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+
+/**
+ * @interface Order
+ * @description Defines the structure of an order object.
+ * @property {string} id - Unique identifier for the order.
+ * @property {string} orderNumber - Human-readable order number/identifier.
+ * @property {{ name: string; email: string; }} customer - Information about the customer who placed the order.
+ * @property {OrderItem[]} items - An array of items included in the order.
+ * @property {number} total - The total monetary value of the order.
+ * @property {OrderStatus} status - The current status of the order.
+ * @property {string} paymentMethod - Method used for payment (e.g., 'Credit Card', 'PayPal').
+ * @property {string} shippingAddress - The address where the order is to be shipped.
+ * @property {string} createdAt - ISO date string representing when the order was created.
+ * @property {string} updatedAt - ISO date string representing when the order was last updated.
+ */
 interface Order {
-  id: string
-  orderNumber: string
+  id: string;
+  orderNumber: string;
   customer: {
-    name: string
-    email: string
-  }
-  items: OrderItem[]
-  total: number
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
-  paymentMethod: string
-  shippingAddress: string
-  createdAt: string
-  updatedAt: string
+    name: string;
+    email: string;
+  };
+  items: OrderItem[];
+  total: number;
+  status: OrderStatus;
+  paymentMethod: string;
+  shippingAddress: string;
+  createdAt: string; // Should ideally be Date object or ISO string
+  updatedAt: string; // Should ideally be Date object or ISO string
 }
 
-// Mock data
+// TODO: Replace mockOrders with actual data fetched from an API or data source.
+/**
+ * @const mockOrders
+ * @description An array of mock order data used for demonstration purposes.
+ */
 const mockOrders: Order[] = [
   {
     id: '1',
@@ -192,14 +231,30 @@ const mockOrders: Order[] = [
     createdAt: '2024-03-14T16:45:00',
     updatedAt: '2024-03-17T10:00:00'
   }
+  // ... more mock orders
 ]
 
+/**
+ * @function Orders
+ * @description The main component for the Orders page.
+ * It displays a table of orders, allows viewing order details in a dialog,
+ * and provides actions for each order (e.g., updating status).
+ * Currently uses mock data.
+ * @returns {JSX.Element} The rendered Orders page.
+ */
 export default function Orders() {
-  const [orders] = useState<Order[]>(mockOrders)
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false)
-  const [selectedRows, setSelectedRows] = useState<Order[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [orders, _setOrders] = useState<Order[]>(mockOrders); // State for orders data, initialized with mock data
+                                                          // `_setOrders` would be used if fetching/updating data
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null); // State for the currently viewed order details
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false); // State to control the visibility of the order details dialog
+  const [selectedRows, setSelectedRows] = useState<Order[]>([]); // State for rows selected in the DataTable
 
+  /**
+   * @const columns
+   * @description Configuration for the columns in the DataTable displaying orders.
+   * Defines how each piece of order data is rendered.
+   */
   const columns = [
     {
       key: 'orderNumber',
@@ -278,20 +333,42 @@ export default function Orders() {
     }
   ]
 
+  /**
+   * @function handleViewDetails
+   * @description Sets the selected order and opens the details dialog.
+   * @param {Order} order - The order object for which to view details.
+   */
   const handleViewDetails = (order: Order) => {
-    setSelectedOrder(order)
-    setIsDetailsOpen(true)
-  }
+    setSelectedOrder(order);
+    setIsDetailsOpen(true);
+  };
 
-  const handleUpdateStatus = (orderId: string, newStatus: Order['status']) => {
-    // In a real app, this would update the order status
-    console.log(`Updating order ${orderId} to status ${newStatus}`)
-  }
+  /**
+   * @function handleUpdateStatus
+   * @description Placeholder function to simulate updating an order's status.
+   * In a real application, this would involve an API call.
+   * @param {string} orderId - The ID of the order to update.
+   * @param {OrderStatus} newStatus - The new status for the order.
+   */
+  const handleUpdateStatus = (orderId: string, newStatus: OrderStatus) => {
+    // In a real app, this would update the order status via an API call
+    // and then potentially update the local state or re-fetch data.
+    console.log(`Updating order ${orderId} to status ${newStatus}`);
+    // Example of updating local state (for demo purposes, not fully implemented here):
+    // setOrders(prevOrders => prevOrders.map(o => o.id === orderId ? {...o, status: newStatus} : o));
+  };
 
-  const actions = (order: Order) => (
+  /**
+   * @function actions
+   * @description A function that returns JSX for the actions column in the DataTable.
+   * This typically includes a dropdown menu with actions like "View Details" or "Update Status".
+   * @param {Order} order - The order object for the current row.
+   * @returns {JSX.Element} The actions dropdown menu for the order.
+   */
+  const actions = (order: Order): JSX.Element => (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger>
-        <IconButton variant="ghost" size="2">
+        <IconButton variant="ghost" size="2"> {/* Use Radix IconButton */}
           <DotsHorizontalIcon />
         </IconButton>
       </DropdownMenu.Trigger>

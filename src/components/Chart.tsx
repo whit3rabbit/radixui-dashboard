@@ -1,9 +1,22 @@
+/**
+ * @file Chart.tsx
+ * @description This file defines a reusable Chart component using ApexCharts.
+ * It supports various chart types and custom options, adapting to the application's theme.
+ */
 import { useEffect, useState, memo, useMemo } from 'react'
 import ReactApexChart from 'react-apexcharts'
 import { ApexOptions } from 'apexcharts'
 import { useTheme } from '../lib/theme-context'
 import { LoadingSpinner } from './ui/LoadingSpinner'
 
+/**
+ * @interface ChartProps
+ * @description Defines the props for the Chart component.
+ * @property {'line' | 'area' | 'bar' | 'pie' | 'donut'} type - The type of chart to render.
+ * @property {any[]} series - The data series to display in the chart.
+ * @property {ApexOptions} [options] - Custom ApexCharts options to merge with default options.
+ * @property {number} [height] - The height of the chart in pixels.
+ */
 interface ChartProps {
   type: 'line' | 'area' | 'bar' | 'pie' | 'donut'
   series: any[]
@@ -11,6 +24,14 @@ interface ChartProps {
   height?: number
 }
 
+/**
+ * @function Chart
+ * @description A reusable chart component that wraps ReactApexChart.
+ * It handles theme adaptation and provides default styling.
+ * It also shows a loading spinner until the chart is ready to be rendered.
+ * @param {ChartProps} props - The props for the Chart component.
+ * @returns {JSX.Element} The rendered Chart component or a loading spinner.
+ */
 function Chart({ type, series, options = {}, height = 300 }: ChartProps) {
   const [isMounted, setIsMounted] = useState(false)
   const { themeConfig, getSystemTheme } = useTheme()

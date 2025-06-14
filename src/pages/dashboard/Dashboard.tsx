@@ -1,33 +1,70 @@
+/**
+ * @file Dashboard.tsx
+ * @description This file defines the main Dashboard page component.
+ * It serves as the central overview page, displaying key metrics, charts,
+ * and summaries of various aspects of the application or business.
+ * All data displayed is currently mock data.
+ */
 import { Grid, Card, Flex, Heading, Text, Badge, Box, Button } from '@radix-ui/themes'
 import { ArrowUpIcon, ArrowDownIcon, PlusIcon } from '@radix-ui/react-icons'
-import Chart from '../../components/Chart'
+import Chart from '../../components/Chart' // Reusable Chart component
 
+/**
+ * @function Dashboard
+ * @description The main component for the dashboard overview page.
+ * It renders a collection of statistical cards (StatsCard) and charts
+ * to provide a high-level summary of data.
+ * Currently uses mock data for demonstration.
+ * @returns {JSX.Element} The rendered Dashboard page.
+ */
 export default function Dashboard() {
+  // TODO: Replace all mock data with actual data fetched from an API or data source.
+
+  /**
+   * @const revenueData
+   * @description Mock data for the revenue overview chart.
+   * Represents monthly revenue.
+   */
   const revenueData = [
     {
-      name: 'Revenue',
-      data: [31, 40, 28, 51, 42, 109, 100, 91, 80, 70, 95, 110]
+      name: 'Revenue', // Series name
+      data: [3100, 4000, 2800, 5100, 4200, 10900, 10000, 9100, 8000, 7000, 9500, 11000] // Example monthly revenue
     }
   ]
 
+  /**
+   * @const userGrowthData
+   * @description Mock data for the user growth chart.
+   * Represents new users per month.
+   */
   const userGrowthData = [
     {
-      name: 'Users',
-      data: [10, 41, 35, 51, 49, 62, 69, 91, 148, 120, 140, 180]
+      name: 'Users', // Series name
+      data: [10, 41, 35, 51, 49, 62, 69, 91, 148, 120, 140, 180] // Example new users per month
     }
   ]
 
+  /**
+   * @const salesData
+   * @description Mock data for the sales performance chart.
+   * Represents number of sales per month.
+   */
   const salesData = [
     {
-      name: 'Sales',
-      data: [44, 55, 57, 56, 61, 58, 63, 60, 66, 70, 75, 80]
+      name: 'Sales', // Series name
+      data: [44, 55, 57, 56, 61, 58, 63, 60, 66, 70, 75, 80] // Example sales count per month
     }
   ]
 
+  /**
+   * @const categoryData
+   * @description Mock data for the categories donut chart.
+   * Represents distribution across different categories.
+   */
   const categoryData = [
     {
-      name: 'Categories',
-      data: [44, 35, 41, 17, 15]
+      name: 'Categories', // Series name (though often not directly visible in donut charts)
+      data: [44, 35, 41, 17, 15] // Example data for 5 categories
     }
   ]
 
@@ -146,10 +183,16 @@ interface StatsCardProps {
   title: string
   value: string
   change: string
-  isPositive: boolean
-  description: string
+  isPositive: boolean;
+  description: string;
 }
 
+/**
+ * @function StatsCard
+ * @description A reusable component to display a single statistic with a title, value, change indicator, and description.
+ * @param {StatsCardProps} props - The props for the StatsCard component.
+ * @returns {JSX.Element} The rendered StatsCard.
+ */
 function StatsCard({ title, value, change, isPositive, description }: StatsCardProps) {
   return (
     <Card size="3">

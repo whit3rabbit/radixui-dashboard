@@ -1,46 +1,96 @@
+/**
+ * @file Register.tsx
+ * @description This file defines the Register page component.
+ * It allows new users to create an account by providing their name, email, and password.
+ * It includes form validation, password strength indication, terms agreement,
+ * and handles the registration process.
+ */
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Container, Card, Flex, Heading, Text, TextField, Button, Separator, Box, IconButton, Callout, Checkbox } from '@radix-ui/themes'
 import { EnvelopeClosedIcon, LockClosedIcon, PersonIcon, SunIcon, MoonIcon, EyeOpenIcon, EyeClosedIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons'
 import { useTheme } from '../../lib/theme-context'
 import { useAuth } from '../../lib/auth-context'
-import { validateEmail, validatePassword, validatePasswordMatch, validateName } from '../../lib/validation'
-import PasswordStrengthIndicator from '../../components/PasswordStrengthIndicator'
+import { validateEmail, validatePassword, validatePasswordMatch, validateName } from '../../lib/validation' // Validation utilities
+import PasswordStrengthIndicator from '../../components/PasswordStrengthIndicator' // Component to show password strength
 
+/**
+ * @typedef RegisterFormData
+ * @description Defines the structure for the registration form data.
+ * @property {string} name - User's full name.
+ * @property {string} email - User's email address.
+ * @property {string} password - User's chosen password.
+ * @property {string} confirmPassword - Confirmation of the password.
+ * @property {boolean} agreeToTerms - Whether the user has agreed to terms and conditions.
+ */
+type RegisterFormData = {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  agreeToTerms: boolean;
+};
+
+/**
+ * @typedef RegisterErrors
+ * @description Defines the structure for storing registration form errors.
+ * @property {string} [name] - Error message for the name field.
+ * @property {string} [email] - Error message for the email field.
+ * @property {string} [password] - Error message for the password field.
+ * @property {string} [confirmPassword] - Error message for the confirm password field.
+ * @property {string} [agreeToTerms] - Error message for the terms agreement checkbox.
+ * @property {string} [general] - General error message (e.g., from API response).
+ */
+type RegisterErrors = {
+  name?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+  agreeToTerms?: string;
+  general?: string;
+};
+
+/**
+ * @function Register
+ * @description A component that renders the registration page.
+ * It includes a form for user details, validates input, shows password strength,
+ * handles terms agreement, calls the register function from `AuthContext`,
+ * and navigates to the dashboard on successful registration or displays errors.
+ * @returns {JSX.Element} The rendered Register page.
+ */
 export default function Register() {
-  const { theme, toggleTheme } = useTheme()
-  const { register } = useAuth()
-  const navigate = useNavigate()
-  
-  const [formData, setFormData] = useState({
+  const { theme, toggleTheme } = useTheme(); // Theme context for light/dark mode
+  const { register } = useAuth(); // Auth context for registration functionality
+  const navigate = useNavigate(); // React Router hook for navigation
+
+  const [formData, setFormData] = useState<RegisterFormData>({
     name: '',
     email: '',
     password: '',
     confirmPassword: '',
-    agreeToTerms: false
-  })
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [errors, setErrors] = useState<{
-    name?: string;
-    email?: string;
-    password?: string;
-    confirmPassword?: string;
-    agreeToTerms?: string;
-    general?: string;
-  }>({})
+    agreeToTerms: false,
+  });
+  const [showPassword, setShowPassword] = useState(false); // Toggle visibility for password
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Toggle visibility for confirm password
+  const [isLoading, setIsLoading] = useState(false); // Manage loading state during registration
+  const [errors, setErrors] = useState<RegisterErrors>({}); // Store form validation errors
 
+  /**
+   * @function handleSubmit
+   * @description Handles the registration form submission.
+   * It validates all form fields, calls the register function, and handles the response.
+   * @param {React.FormEvent} e - The form submission event.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault(); // Prevent default form submission
+
     // Validate all fields
-    const nameError = validateName(formData.name)
-    const emailError = validateEmail(formData.email)
-    const passwordError = validatePassword(formData.password)
-    const confirmPasswordError = validatePasswordMatch(formData.password, formData.confirmPassword)
-    const agreeToTermsError = !formData.agreeToTerms ? 'You must agree to the terms and conditions' : null
-    
+    const nameError = validateName(formData.name);
+    const emailError = validateEmail(formData.email);
+    const passwordError = validatePassword(formData.password);
+    const confirmPasswordError = validatePasswordMatch(formData.password, formData.confirmPassword);
+    const agreeToTermsError = !formData.agreeToTerms ? 'You must agree to the terms and conditions' : null;
+
     if (nameError || emailError || passwordError || confirmPasswordError || agreeToTermsError) {
       setErrors({
         name: nameError || undefined,
@@ -48,23 +98,24 @@ export default function Register() {
         password: passwordError || undefined,
         confirmPassword: confirmPasswordError || undefined,
         agreeToTerms: agreeToTermsError || undefined,
-      })
-      return
+      });
+      return; // Stop submission if validation fails
     }
-    
-    setErrors({})
-    setIsLoading(true)
-    
-    const result = await register(formData.email, formData.password, formData.name)
-    
+
+    setErrors({}); // Clear previous errors
+    setIsLoading(true); // Set loading state
+
+    const result = await register(formData.email, formData.password, formData.name); // Attempt registration
+
     if (result.success) {
-      navigate('/dashboard')
+      navigate('/dashboard'); // Navigate to dashboard on successful registration
     } else {
-      setErrors({ general: result.error })
-      setIsLoading(false)
+      // Set general error from registration attempt
+      setErrors({ general: result.error });
+      setIsLoading(false); // Reset loading state
     }
-  }
-  
+  };
+
   return (
     <Container size="1" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
       {/* Theme Toggle */}

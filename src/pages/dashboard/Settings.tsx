@@ -1,8 +1,17 @@
+/**
+ * @file Settings.tsx
+ * @description This file defines the Settings page component for the dashboard.
+ * It provides a multi-tabbed interface for users to configure various aspects
+ * of the application, including general settings, appearance, notifications,
+ * security, integrations (API keys, webhooks), and a demo of UI components.
+ * It utilizes local state for managing settings and dialogs, and mock data/functions
+ * for operations like saving settings and managing API keys/webhooks.
+ */
 import { useState, useEffect } from 'react'
-import { 
-  Box, 
-  Card, 
-  Flex, 
+import {
+  Box,
+  Card,
+  Flex,
   Heading, 
   Text, 
   Tabs, 
@@ -32,141 +41,241 @@ import {
   InfoCircledIcon,
   MixerHorizontalIcon
 } from '@radix-ui/react-icons'
-import { useToast } from '../../components/notifications/toast-context'
-import { ThemeSelector } from '../../components/ThemeSelector'
-import { useTheme } from '../../lib/theme-context'
-import { 
-  EnhancedTextField, 
-  EnhancedSelect, 
+import { useToast } from '../../components/notifications/toast-context' // Toast notifications
+import { ThemeSelector } from '../../components/ThemeSelector' // Theme selection dialog
+import { useTheme } from '../../lib/theme-context' // Theme context
+import {
+  EnhancedTextField,
+  EnhancedSelect,
   EnhancedSwitch
-} from '../../components/ui/FormField'
-import { LoadingOverlay, Skeleton } from '../../components/ui/LoadingSpinner'
-import { storage } from '../../lib/secure-storage'
+} from '../../components/ui/FormField' // Enhanced form components
+import { LoadingOverlay, Skeleton } from '../../components/ui/LoadingSpinner' // Loading indicators
+import { storage } from '../../lib/secure-storage' // Secure storage utility
 
+/**
+ * @typedef GeneralSettingsData
+ * @description Structure for general application settings.
+ */
+type GeneralSettingsData = {
+  companyName: string;
+  companyEmail: string;
+  timezone: string;
+  language: string;
+  dateFormat: string;
+  timeFormat: string;
+};
+
+/**
+ * @typedef AppearanceSettingsData
+ * @description Structure for appearance-related settings.
+ */
+type AppearanceSettingsData = {
+  sidebarCollapsed: boolean;
+  compactMode: boolean;
+  showAnimations: boolean;
+  highlightColor: string;
+};
+
+/**
+ * @typedef NotificationSettingsData
+ * @description Structure for notification preferences.
+ */
+type NotificationSettingsData = {
+  emailNotifications: boolean;
+  pushNotifications: boolean;
+  smsNotifications: boolean;
+  weeklyDigest: boolean;
+  instantAlerts: boolean;
+  marketingEmails: boolean;
+};
+
+/**
+ * @typedef SecuritySettingsData
+ * @description Structure for security-related settings.
+ */
+type SecuritySettingsData = {
+  twoFactorEnabled: boolean;
+  sessionTimeout: string; // e.g., '30' minutes
+  ipWhitelist: string[];
+};
+
+/**
+ * @typedef ApiKeyData
+ * @description Structure for an API key object.
+ */
+type ApiKeyData = {
+  id: string;
+  name: string;
+  key: string; // The actual key string (partially masked for display)
+  created: Date;
+  lastUsed: Date | null;
+};
+
+/**
+ * @typedef WebhookData
+ * @description Structure for a webhook configuration.
+ */
+type WebhookData = {
+  id: string;
+  url: string;
+  events: string[]; // Array of event names this webhook listens to
+  active: boolean;
+};
+
+/**
+ * @function Settings
+ * @description The main component for the Settings page.
+ * It provides a tabbed interface for managing various application settings.
+ * Each tab handles a different category of settings (General, Appearance, Notifications, etc.).
+ * @returns {JSX.Element} The rendered Settings page.
+ */
 export default function Settings() {
-  const { showToast } = useToast()
-  const { theme, availableThemes } = useTheme()
-  const [isLoading, setIsLoading] = useState(false)
-  
-  // General settings state
-  const [generalSettings, setGeneralSettings] = useState({
+  const { showToast } = useToast(); // Hook for displaying toast notifications
+  const { theme, availableThemes } = useTheme(); // Theme context for current theme and available themes
+  const [isLoading, setIsLoading] = useState(false); // Global loading state for operations like saving general settings
+
+  // --- State for different settings categories ---
+  const [generalSettings, setGeneralSettings] = useState<GeneralSettingsData>({
     companyName: 'Acme Corporation',
     companyEmail: 'contact@acme.com',
     timezone: 'America/New_York',
     language: 'en',
     dateFormat: 'MM/DD/YYYY',
     timeFormat: '12h'
-  })
+  });
 
-  // Appearance settings state
-  const [appearanceSettings, setAppearanceSettings] = useState({
+  const [appearanceSettings, setAppearanceSettings] = useState<AppearanceSettingsData>({
     sidebarCollapsed: false,
     compactMode: false,
     showAnimations: true,
     highlightColor: 'blue'
-  })
+  });
 
-  // Notification settings state
-  const [notificationSettings, setNotificationSettings] = useState({
+  const [notificationSettings, setNotificationSettings] = useState<NotificationSettingsData>({
     emailNotifications: true,
     pushNotifications: false,
     smsNotifications: false,
     weeklyDigest: true,
     instantAlerts: true,
     marketingEmails: false
-  })
+  });
 
-  // Security settings state
-  const [securitySettings, setSecuritySettings] = useState({
+  const [securitySettings, setSecuritySettings] = useState<SecuritySettingsData>({
     twoFactorEnabled: false,
-    sessionTimeout: '30',
-    ipWhitelist: ['192.168.1.1', '10.0.0.1']
-  })
+    sessionTimeout: '30', // Default to 30 minutes
+    ipWhitelist: ['192.168.1.1', '10.0.0.1'] // Example IP addresses
+  });
 
-  // API keys state
-  const [apiKeys, setApiKeys] = useState<{
-    id: string;
-    name: string;
-    key: string;
-    created: Date;
-    lastUsed: Date | null;
-  }[]>([
+  const [apiKeys, setApiKeys] = useState<ApiKeyData[]>([
+    // Mock API keys
     { id: '1', name: 'Production API', key: 'sk_live_...abc123', created: new Date('2024-01-15'), lastUsed: new Date('2024-06-12') },
     { id: '2', name: 'Development API', key: 'sk_test_...def456', created: new Date('2024-03-20'), lastUsed: new Date('2024-06-13') }
-  ])
+  ]);
 
-  // Webhooks state
-  const [webhooks, setWebhooks] = useState([
+  const [webhooks, setWebhooks] = useState<WebhookData[]>([
+    // Mock webhooks
     { id: '1', url: 'https://api.example.com/webhook', events: ['user.created', 'payment.completed'], active: true },
     { id: '2', url: 'https://backup.example.com/hook', events: ['order.shipped'], active: false }
-  ])
+  ]);
 
-  const [showApiKeyDialog, setShowApiKeyDialog] = useState(false)
-  const [showWebhookDialog, setShowWebhookDialog] = useState(false)
-  const [showApiKey, setShowApiKey] = useState<string | null>(null)
+  // --- State for dialogs and UI interactions ---
+  const [showApiKeyDialog, setShowApiKeyDialog] = useState(false); // Controls API key creation dialog
+  const [showWebhookDialog, setShowWebhookDialog] = useState(false); // Controls webhook creation dialog
+  const [showApiKey, setShowApiKey] = useState<string | null>(null); // ID of the API key whose full value is currently shown
 
+  /**
+   * @function handleSaveGeneral
+   * @description Simulates saving general settings and shows a toast notification.
+   */
   const handleSaveGeneral = async () => {
-    setIsLoading(true)
-    // Simulate save operation
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
+    setIsLoading(true);
+    // TODO: Replace with actual API call to save generalSettings
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API delay
     showToast({
       type: 'success',
       title: 'Settings saved',
       description: 'General settings have been updated successfully'
-    })
-    setIsLoading(false)
-  }
+    });
+    setIsLoading(false);
+  };
 
+  /**
+   * @function handleSaveAppearance
+   * @description Simulates saving appearance settings and shows a toast.
+   */
   const handleSaveAppearance = () => {
+    // TODO: Implement saving appearanceSettings (e.g., to localStorage or backend)
     showToast({
       type: 'success',
       title: 'Appearance updated',
       description: 'Your appearance preferences have been saved'
-    })
-  }
+    });
+  };
 
+  /**
+   * @function handleSaveNotifications
+   * @description Simulates saving notification settings and shows a toast.
+   */
   const handleSaveNotifications = () => {
+    // TODO: Implement saving notificationSettings
     showToast({
       type: 'success',
       title: 'Notification preferences saved',
       description: 'Your notification settings have been updated'
-    })
-  }
+    });
+  };
 
+  /**
+   * @function handleSaveSecurity
+   * @description Simulates saving security settings and shows a toast.
+   */
   const handleSaveSecurity = () => {
+    // TODO: Implement saving securitySettings
     showToast({
       type: 'success',
       title: 'Security settings updated',
       description: 'Your security preferences have been saved'
-    })
-  }
+    });
+  };
 
+  /**
+   * @function createApiKey
+   * @description Simulates creating a new API key, adds it to the local state, and shows a toast.
+   * @param {string} name - The name for the new API key.
+   */
   const createApiKey = (name: string) => {
-    const newKey = {
+    // TODO: In a real app, the key would be generated by the backend.
+    const newKey: ApiKeyData = {
       id: Date.now().toString(),
       name,
-      key: `sk_${Math.random().toString(36).substring(2, 15)}`,
+      key: `sk_live_${Math.random().toString(36).substring(2, 15)}`, // Mock key generation
       created: new Date(),
       lastUsed: null
-    }
-    setApiKeys([...apiKeys, newKey])
-    setShowApiKeyDialog(false)
+    };
+    setApiKeys([...apiKeys, newKey]);
+    setShowApiKeyDialog(false); // Close dialog
     showToast({
       type: 'success',
       title: 'API key created',
-      description: 'Your new API key has been generated'
-    })
-  }
+      description: `New API key "${name}" has been generated.`
+    });
+  };
 
+  /**
+   * @function deleteApiKey
+   * @description Simulates deleting an API key from local state and shows a toast.
+   * @param {string} id - The ID of the API key to delete.
+   */
   const deleteApiKey = (id: string) => {
-    setApiKeys(apiKeys.filter(key => key.id !== id))
+    setApiKeys(apiKeys.filter(key => key.id !== id));
     showToast({
       type: 'success',
       title: 'API key deleted',
-      description: 'The API key has been removed'
-    })
-  }
+      description: 'The selected API key has been removed.'
+    });
+  };
+
+  // TODO: Implement similar create/delete functions for webhooks.
 
   return (
     <Box>
@@ -863,57 +972,108 @@ export default function Settings() {
   )
 }
 
-// Component to display storage information
+/**
+ * @function StorageInfoDisplay
+ * @description A sub-component within the Settings page to display information
+ * about the application's usage of secure local storage.
+ * It shows total items, used space, and provides an option to clear storage.
+ * @returns {JSX.Element} The rendered storage information display.
+ */
 function StorageInfoDisplay() {
-  const [storageInfo, setStorageInfo] = useState<any>(null);
+  const [storageInfo, setStorageInfo] = useState<ReturnType<typeof storage.utils.getInfo> | null>(null);
   const [loading, setLoading] = useState(true);
+  const { showToast } = useToast();
 
   useEffect(() => {
+    // Simulate fetching storage info, or if it's synchronous, just set it.
+    // Adding a timeout to demonstrate skeleton loading.
     setTimeout(() => {
-      const info = storage.getInfo();
-      setStorageInfo(info);
+      try {
+        const info = storage.utils.getInfo(); // Use namespaced util
+        setStorageInfo(info);
+      } catch (error) {
+        console.error("Failed to get storage info:", error);
+        showToast({type: 'error', title: 'Storage Error', description: 'Could not retrieve storage information.'});
+      }
       setLoading(false);
-    }, 1000);
-  }, []);
+    }, 500); // Reduced timeout for faster display
+  }, [showToast]); // Added showToast to dependency array if it's stable
+
+  const handleClearStorage = () => {
+    try {
+      storage.utils.clearAll(); // Use namespaced util
+      setStorageInfo(storage.utils.getInfo()); // Refresh info
+      showToast({
+        type: 'success',
+        title: 'Storage Cleared',
+        description: 'All application data has been cleared from local storage.'
+      });
+    } catch (error) {
+      console.error("Failed to clear storage:", error);
+      showToast({type: 'error', title: 'Storage Error', description: 'Could not clear storage.'});
+    }
+  };
+
+  const handleCleanupStorage = () => {
+    try {
+      const cleanedCount = storage.utils.cleanup(); // Use namespaced util
+      setStorageInfo(storage.utils.getInfo()); // Refresh info
+      showToast({
+        type: 'info',
+        title: 'Storage Cleanup',
+        description: `${cleanedCount} expired item(s) removed.`
+      });
+    } catch (error) {
+      console.error("Failed to cleanup storage:", error);
+      showToast({type: 'error', title: 'Storage Error', description: 'Could not cleanup storage.'});
+    }
+  };
 
   if (loading) {
-    return <Skeleton loading={true} lines={3}>Loading...</Skeleton>;
+    // Ensure Skeleton has children or a defined height/width to prevent rendering issues
+    return <Skeleton loading={true} lines={3} height="20px"><Text>Loading storage info...</Text></Skeleton>;
   }
 
   return (
     <Flex direction="column" gap="3">
       <Box>
         <Text size="2" weight="medium">Storage Statistics</Text>
-        <Flex gap="4" mt="2">
-          <Badge color="blue">
-            {storageInfo?.totalItems || 0} items
+        <Flex gap="4" mt="2" wrap="wrap">
+          <Badge color="blue" variant="soft">
+            Total Items: {storageInfo?.totalItems || 0}
           </Badge>
-          <Badge color="green">
-            {storageInfo?.totalSize || 0} KB used
+          <Badge color="green" variant="soft">
+            Used Space: {storageInfo?.totalSize || 0} KB
           </Badge>
           {storageInfo?.expiredItems?.length > 0 && (
-            <Badge color="orange">
-              {storageInfo.expiredItems.length} expired
+            <Badge color="orange" variant="soft">
+              Expired Items: {storageInfo.expiredItems.length}
             </Badge>
           )}
         </Flex>
       </Box>
-      
-      <Box>
-        <Button 
-          size="2" 
+
+      <Flex gap="3" mt="2">
+        <Button
+          size="2"
           variant="soft"
-          onClick={() => {
-            storage.cleanup();
-            setStorageInfo(storage.getInfo());
-          }}
+          onClick={handleCleanupStorage}
         >
           <ReloadIcon />
-          Cleanup Storage
+          Cleanup Expired
         </Button>
-      </Box>
+        <Button
+          size="2"
+          variant="outline"
+          color="red"
+          onClick={handleClearStorage}
+        >
+          <TrashIcon />
+          Clear All Storage
+        </Button>
+      </Flex>
 
-      <Callout.Root color="blue" size="1">
+      <Callout.Root color="blue" size="1" mt="2">
         <Callout.Icon>
           <InfoCircledIcon />
         </Callout.Icon>
