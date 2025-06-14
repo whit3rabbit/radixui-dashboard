@@ -24,7 +24,8 @@ import {
   IconButton,
   Checkbox,
   Code,
-  DropdownMenu
+  DropdownMenu,
+  Table
 } from '@radix-ui/themes'
 import { 
   PlusIcon, 

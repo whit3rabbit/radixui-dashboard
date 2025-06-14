@@ -6,7 +6,7 @@
  * and offers actions such as retrying, returning to the dashboard, or reporting the issue.
  */
 import { Link } from 'react-router-dom'
-import { Container, Flex, Heading, Text, Button, Card, Box, Code, Callout } from '@radix-ui/themes'
+import { Container, Flex, Heading, Text, Button, Card, Box, Code, Callout, Link as RadixLink } from '@radix-ui/themes';
 import {
   HomeIcon,
   ReloadIcon,
@@ -79,7 +79,6 @@ export default function ServerError() {
     // TODO: Implement actual issue reporting (e.g., send errorDetails to Sentry, LogRocket, or a custom backend)
     console.error('Issue reported by user:', errorDetails);
     alert('Thank you for reporting the issue. Our team has been notified.'); // Simple feedback
-import { Container, Flex, Heading, Text, Button, Card, Box, Code, Callout, Link as RadixLink } from '@radix-ui/themes'
 // ... other imports
 
 // ... ErrorDetails interface and ServerError function component start
@@ -106,7 +105,8 @@ import { Container, Flex, Heading, Text, Button, Card, Box, Code, Callout, Link 
         </Flex>
 
         {/* Error Alert */}
-        <Card width="100%" maxWidth="600px">
+        <Box style={{ maxWidth: '600px', width: '100%' }}>
+          <Card>
           <Callout.Root color="red" size="2">
             <Callout.Icon>
               <ExclamationTriangleIcon />
@@ -115,6 +115,8 @@ import { Container, Flex, Heading, Text, Button, Card, Box, Code, Callout, Link 
               {errorDetails.message}
             </Callout.Text>
           </Callout.Root>
+          </Card>
+        </Box>
           
           {/* Technical Details Toggle */}
           <Box mt="3">
@@ -167,7 +169,6 @@ import { Container, Flex, Heading, Text, Button, Card, Box, Code, Callout, Link 
               </Flex>
             </Box>
           )}
-        </Card>
 
         {/* Action Buttons */}
         <Flex gap="3" wrap="wrap" justify="center">
@@ -175,8 +176,8 @@ import { Container, Flex, Heading, Text, Button, Card, Box, Code, Callout, Link 
             <ReloadIcon />
             Try Again
           </Button>
-          <Link to="/dashboard" asChild>
-            <Button size="3" variant="soft">
+          <Link to="/dashboard">
+            <Button size="3" variant="soft" asChild>
               <HomeIcon />
               Go to Dashboard
             </Button>
@@ -190,8 +191,8 @@ import { Container, Flex, Heading, Text, Button, Card, Box, Code, Callout, Link 
         {/* Status Page Link */}
         <Text size="2" color="gray">
           Check our{' '}
-          <RadixLink asChild>
-            <Link to="/status">status page</Link>
+          <RadixLink asChild href="/status">
+            status page
           </RadixLink>
           {' '}for updates on system availability.
         </Text>
