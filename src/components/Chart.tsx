@@ -6,6 +6,7 @@
 import { useEffect, useState, memo, useMemo } from 'react'
 import ReactApexChart from 'react-apexcharts'
 import { ApexOptions } from 'apexcharts'
+import { Box } from '@radix-ui/themes'
 import { useTheme } from '../lib/theme-context'
 import { LoadingSpinner } from './ui/LoadingSpinner'
 
@@ -104,9 +105,9 @@ function Chart({ type, series, options = {}, height = 300 }: ChartProps) {
 
   if (!isMounted) {
     return (
-      <div style={{ height }}>
+      <Box style={{ height }}>
         <LoadingSpinner message="Loading chart..." />
-      </div>
+      </Box>
     )
   }
 

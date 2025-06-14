@@ -79,14 +79,20 @@ export default function ServerError() {
     // TODO: Implement actual issue reporting (e.g., send errorDetails to Sentry, LogRocket, or a custom backend)
     console.error('Issue reported by user:', errorDetails);
     alert('Thank you for reporting the issue. Our team has been notified.'); // Simple feedback
+import { Container, Flex, Heading, Text, Button, Card, Box, Code, Callout, Link as RadixLink } from '@radix-ui/themes'
+// ... other imports
+
+// ... ErrorDetails interface and ServerError function component start
+
   };
 
   return (
-    <Container size="2" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center' }}>
-      <Flex direction="column" align="center" gap="6" style={{ width: '100%', textAlign: 'center' }}>
-        {/* 500 Illustration */}
-        <Box>
-          <Text size="9" weight="bold" style={{ fontSize: '120px', color: 'var(--red-9)' }}>
+    <Flex align="center" justify="center" style={{ minHeight: '100vh' }}>
+      <Container size="2">
+        <Flex direction="column" align="center" gap="6" style={{ width: '100%' }}> {/* Removed textAlign: 'center' */}
+          {/* 500 Illustration */}
+          <Box>
+            <Text size="9" weight="bold" style={{ fontSize: '120px', color: 'var(--red-9)' }} align="center"> {/* Added align="center" */}
             500
           </Text>
         </Box>
@@ -100,7 +106,7 @@ export default function ServerError() {
         </Flex>
 
         {/* Error Alert */}
-        <Card style={{ width: '100%', maxWidth: '600px' }}>
+        <Card width="100%" maxWidth="600px">
           <Callout.Root color="red" size="2">
             <Callout.Icon>
               <ExclamationTriangleIcon />
@@ -126,22 +132,22 @@ export default function ServerError() {
           {showDetails && (
             <Box mt="3">
               <Flex direction="column" gap="3" align="start">
-                <Box style={{ width: '100%' }}>
+                <Box width="100%">
                   <Text size="2" weight="medium" color="gray">Request ID</Text>
                   <Code size="2">{errorDetails.requestId}</Code>
                 </Box>
                 
-                <Box style={{ width: '100%' }}>
+                <Box width="100%">
                   <Text size="2" weight="medium" color="gray">Timestamp</Text>
                   <Code size="2">{errorDetails.timestamp}</Code>
                 </Box>
                 
-                <Box style={{ width: '100%' }}>
+                <Box width="100%">
                   <Text size="2" weight="medium" color="gray">Error Code</Text>
                   <Code size="2">{errorDetails.errorCode}</Code>
                 </Box>
                 
-                <Box style={{ width: '100%' }}>
+                <Box width="100%">
                   <Text size="2" weight="medium" color="gray">Stack Trace</Text>
                   <Box
                     p="3"
@@ -169,7 +175,7 @@ export default function ServerError() {
             <ReloadIcon />
             Try Again
           </Button>
-          <Link to="/dashboard">
+          <Link to="/dashboard" asChild>
             <Button size="3" variant="soft">
               <HomeIcon />
               Go to Dashboard
@@ -184,12 +190,13 @@ export default function ServerError() {
         {/* Status Page Link */}
         <Text size="2" color="gray">
           Check our{' '}
-          <Link to="/status" style={{ color: 'var(--blue-9)' }}>
-            status page
-          </Link>
+          <RadixLink asChild>
+            <Link to="/status">status page</Link>
+          </RadixLink>
           {' '}for updates on system availability.
         </Text>
-      </Flex>
-    </Container>
+        </Flex>
+      </Container>
+    </Flex>
   )
 }

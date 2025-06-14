@@ -112,12 +112,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         <Flex
           align="center"
           justify="center"
+          p="8" // padding: '2rem' -> p="8" (assuming 1rem = 16px, 2rem = 32px, Radix space-8 = 32px)
           style={{
-            minHeight: '400px',
-            padding: '2rem'
+            minHeight: '400px', // minHeight remains in style
           }}
         >
-          <Card style={{ maxWidth: '600px', width: '100%' }}>
+          <Card maxWidth="600px" width="100%">
             <Flex direction="column" gap="4" align="center">
               <Box>
                 <ExclamationTriangleIcon 

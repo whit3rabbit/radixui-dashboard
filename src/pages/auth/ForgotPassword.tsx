@@ -51,27 +51,28 @@ export default function ForgotPassword() {
   }
   
   return (
-    <Container size="1" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+    <Flex align="center" justify="center" style={{ minHeight: '100vh', position: 'relative' }}>
       {/* Theme Toggle */}
       <IconButton 
         size="3" 
         variant="ghost" 
         onClick={toggleTheme}
-        style={{ position: 'absolute', top: '20px', right: '20px' }}
+        style={{ position: 'absolute', top: '20px', right: '20px' }} // Absolute positioning fine here
       >
         {theme === 'light' ? <MoonIcon /> : <SunIcon />}
       </IconButton>
       
-      <Card size="4" style={{ width: '100%', maxWidth: '400px' }}>
-        {!isSubmitted ? (
-          <form onSubmit={handleSubmit}>
-            <Flex direction="column" gap="4">
-              <Link to="/login" style={{ textDecoration: 'none' }}>
-                <Flex align="center" gap="2" mb="2">
-                  <ArrowLeftIcon />
-                  <Text size="2" color="gray">Back to login</Text>
-                </Flex>
-              </Link>
+      <Container size="1"> {/* Container for width constraint */}
+        <Card size="4" style={{ width: '100%' }} maxWidth="400px"> {/* Card takes full width of container, but max width */}
+          {!isSubmitted ? (
+            <form onSubmit={handleSubmit}>
+              <Flex direction="column" gap="4">
+                <Link to="/login" style={{ textDecoration: 'none' }} asChild>
+                  <Flex align="center" gap="2" mb="2" style={{ cursor: 'pointer' }}> {/* Added cursor for clarity as it becomes a link */}
+                    <ArrowLeftIcon />
+                    <Text size="2" color="gray">Back to login</Text>
+                  </Flex>
+                </Link>
               
               <Flex direction="column" align="center" gap="2" mb="4">
                 <Heading size="6">Forgot password?</Heading>
@@ -90,7 +91,7 @@ export default function ForgotPassword() {
               )}
 
               <Box>
-                <Text size="2" weight="medium" style={{ display: 'block', marginBottom: '4px' }}>
+                <Text as="div" size="2" weight="medium" mb="1"> {/* display: 'block', marginBottom: '4px' */}
                   Email
                 </Text>
                 <TextField.Root 
@@ -130,12 +131,13 @@ export default function ForgotPassword() {
               </Callout.Text>
             </Callout.Root>
 
-            <Button variant="soft" size="3" asChild style={{ width: '100%' }}>
+            <Button variant="soft" size="3" asChild width="100%">
               <Link to="/login">Back to login</Link>
             </Button>
           </Flex>
         )}
-      </Card>
-    </Container>
+        </Card>
+      </Container>
+    </Flex>
   )
 }

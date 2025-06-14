@@ -5,7 +5,7 @@
  * a `Skeleton` component for placeholder loading, a `LoadingButton`, and a `PageLoading` component.
  */
 import React from 'react';
-import { Flex, Box, Text, Spinner } from '@radix-ui/themes';
+import { Flex, Box, Text, Spinner, Button as RadixButton } from '@radix-ui/themes';
 
 /**
  * @interface LoadingSpinnerProps
@@ -199,7 +199,7 @@ export function Skeleton({
     background: 'linear-gradient(90deg, var(--gray-3) 25%, var(--gray-4) 50%, var(--gray-3) 75%)',
     backgroundSize: '200% 100%',
     animation: 'shimmer 1.5s infinite',
-    borderRadius: '4px',
+    borderRadius: 'var(--radius-2)', // Changed to Radix token (4px is often radius-2)
     width: typeof width === 'number' ? `${width}px` : width,
     height: typeof height === 'number' ? `${height}px` : height,
   };
@@ -230,21 +230,20 @@ export function Skeleton({
  * @property {boolean} [loading=false] - If true, shows a spinner and disables the button.
  * @property {React.ReactNode} children - The content of the button (text or icon).
  * @property {string} [loadingText] - Optional text to display next to the spinner when loading. Defaults to children.
- * @property {'solid' | 'soft' | 'outline' | 'ghost'} [variant] - Radix UI button variant (styling purposes, not directly applied here yet).
- * @property {'1' | '2' | '3' | '4'} [size] - Radix UI button size (styling purposes, not directly applied here yet).
+ * @property {'solid' | 'soft' | 'outline' | 'ghost'} [variant] - Radix UI button variant.
+ * @property {'1' | '2' | '3' | '4'} [size] - Radix UI button size.
  */
-interface LoadingButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface LoadingButtonProps extends React.ComponentPropsWithoutRef<typeof RadixButton> {
   loading?: boolean;
   children: React.ReactNode;
   loadingText?: string;
-  variant?: 'solid' | 'soft' | 'outline' | 'ghost'; // For potential future Radix Button integration
-  size?: '1' | '2' | '3' | '4'; // For potential future Radix Button integration
+  // variant and size are now directly from RadixButton props
 }
 
 /**
  * @function LoadingButton
- * @description A button component that can display a loading state with a spinner.
- * It wraps a standard HTML button and adds loading indicators.
+ * @description A button component that can display a loading state with a spinner, built using Radix UI Button.
+ * It wraps a Radix UI Button and adds loading indicators.
  * @param {LoadingButtonProps} props - The props for the component.
  * @returns {JSX.Element} The rendered loading button.
  */
@@ -254,27 +253,30 @@ export function LoadingButton({
   loadingText,
   disabled,
   className,
-  // variant, // Not used directly, but kept for API consistency if <Button> is used
-  // size,    // Not used directly
+  variant = 'solid', // Default Radix Button variant
+  size = '2',       // Default Radix Button size
   ...props
 }: LoadingButtonProps) {
+  // Determine spinner size based on button size for better visual harmony
+  const spinnerSize = (size === '1' || size === '2') ? '1' : (size === '3') ? '2' : '3';
+
   return (
-    // Consider using <Button> from @radix-ui/themes for consistency if advanced styling is needed.
-    // For now, a simple HTML button is used to demonstrate the loading state.
-    <button
+    <RadixButton
       {...props}
       disabled={loading || disabled}
-      className={className} // Allow custom classes
-      style={{
-        display: 'inline-flex', // Ensures spinner and text align well
-        alignItems: 'center',
-        gap: '8px', // Space between spinner and text
-        ...props.style // Allow overriding styles
-      }}
+      className={className}
+      variant={variant}
+      size={size}
     >
-      {loading && <Spinner size="1" />} {/* Radix Spinner */}
+      {loading && (
+        // Use a Flex span to manage gap between spinner and text if RadixButton doesn't handle it automatically
+        // For many cases, Radix Button's internal padding and icon handling might be sufficient
+        <Flex as="span" align="center" justify="center" mr={children || loadingText ? "2" : "0"}>
+          <Spinner size={spinnerSize} />
+        </Flex>
+      )}
       {loading ? (loadingText || children) : children}
-    </button>
+    </RadixButton>
   );
 }
 
@@ -305,7 +307,7 @@ export function PageLoading({
       direction="column"
       align="center"
       justify="center"
-      style={{ minHeight: '400px' }} // Ensure it takes up significant space
+      minHeight="400px" // Changed to prop
       gap="4"
     >
       <Spinner size="3" />

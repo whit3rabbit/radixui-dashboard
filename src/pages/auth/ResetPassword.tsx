@@ -105,21 +105,22 @@ export default function ResetPassword() {
   };
 
   return (
-    <Container size="1" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+    <Flex align="center" justify="center" style={{ minHeight: '100vh', position: 'relative' }}>
       {/* Theme Toggle */}
       <IconButton 
         size="3" 
         variant="ghost" 
         onClick={toggleTheme}
-        style={{ position: 'absolute', top: '20px', right: '20px' }}
+        style={{ position: 'absolute', top: '20px', right: '20px' }} // Absolute positioning fine here
       >
         {theme === 'light' ? <MoonIcon /> : <SunIcon />}
       </IconButton>
       
-      <Card size="4" style={{ width: '100%', maxWidth: '400px' }}>
-        {!isSubmitted ? (
-          <form onSubmit={handleSubmit}>
-            <Flex direction="column" gap="4">
+      <Container size="1"> {/* Container for width constraint */}
+        <Card size="4" width="100%" maxWidth="400px"> {/* Card takes full width of container, but max width */}
+          {!isSubmitted ? (
+            <form onSubmit={handleSubmit}>
+              <Flex direction="column" gap="4">
               <Flex direction="column" align="center" gap="2" mb="4">
                 <Heading size="6">Reset your password</Heading>
                 <Text color="gray" align="center">
@@ -138,7 +139,7 @@ export default function ResetPassword() {
 
               <Flex direction="column" gap="3">
                 <Box>
-                  <Text size="2" weight="medium" style={{ display: 'block', marginBottom: '4px' }}>
+                  <Text as="div" size="2" weight="medium" mb="1"> {/* display: 'block', marginBottom: '4px' */}
                     New Password
                   </Text>
                   <TextField.Root 
@@ -170,7 +171,7 @@ export default function ResetPassword() {
                 </Box>
 
                 <Box>
-                  <Text size="2" weight="medium" style={{ display: 'block', marginBottom: '4px' }}>
+                  <Text as="div" size="2" weight="medium" mb="1"> {/* display: 'block', marginBottom: '4px' */}
                     Confirm New Password
                   </Text>
                   <TextField.Root 
@@ -209,8 +210,8 @@ export default function ResetPassword() {
                 <Text size="2" color="gray">
                   Remember your password?
                 </Text>
-                <Link to="/login">
-                  <Text size="2" color="blue" style={{ textDecoration: 'none' }}>
+                <Link to="/login" asChild>
+                  <Text size="2" color="blue" style={{ cursor: 'pointer' }}> {/* Removed textDecoration, added cursor */}
                     Sign in
                   </Text>
                 </Link>
@@ -229,12 +230,13 @@ export default function ResetPassword() {
               </Text>
             </Flex>
 
-            <Button size="3" asChild style={{ width: '100%' }}>
+            <Button size="3" asChild width="100%">
               <Link to="/login">Go to login</Link>
             </Button>
           </Flex>
         )}
-      </Card>
-    </Container>
+        </Card>
+      </Container>
+    </Flex>
   )
 }

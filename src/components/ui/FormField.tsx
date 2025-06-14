@@ -202,15 +202,25 @@ export function EnhancedTextArea({
       {(error || success || helperText) && (
         <Box>
           {error && (
-            <Text size="1" color="red">
-              {error}
-            </Text>
+            <Callout.Root color="red" size="1">
+              <Callout.Icon>
+                <ExclamationTriangleIcon />
+              </Callout.Icon>
+              <Callout.Text>
+                <Text size="1">{error}</Text>
+              </Callout.Text>
+            </Callout.Root>
           )}
           
           {success && !error && (
-            <Text size="1" color="green">
-              {success}
-            </Text>
+            <Callout.Root color="green" size="1">
+              <Callout.Icon>
+                <CheckIcon />
+              </Callout.Icon>
+              <Callout.Text>
+                <Text size="1">{success}</Text>
+              </Callout.Text>
+            </Callout.Root>
           )}
           
           {helperText && !error && !success && (
@@ -294,15 +304,25 @@ export function EnhancedSelect({
       {(error || success || helperText) && (
         <Box>
           {error && (
-            <Text size="1" color="red">
-              {error}
-            </Text>
+            <Callout.Root color="red" size="1">
+              <Callout.Icon>
+                <ExclamationTriangleIcon />
+              </Callout.Icon>
+              <Callout.Text>
+                <Text size="1">{error}</Text>
+              </Callout.Text>
+            </Callout.Root>
           )}
           
           {success && !error && (
-            <Text size="1" color="green">
-              {success}
-            </Text>
+            <Callout.Root color="green" size="1">
+              <Callout.Icon>
+                <CheckIcon />
+              </Callout.Icon>
+              <Callout.Text>
+                <Text size="1">{success}</Text>
+              </Callout.Text>
+            </Callout.Root>
           )}
           
           {helperText && !error && !success && (
@@ -367,17 +387,27 @@ export function EnhancedCheckbox({
       </Flex>
       
       {(error || success || helperText) && (
-        <Box>
+        <Box mt="1"> {/* Added small margin for spacing from checkbox line */}
           {error && (
-            <Text size="1" color="red">
-              {error}
-            </Text>
+            <Callout.Root color="red" size="1">
+              <Callout.Icon>
+                <ExclamationTriangleIcon />
+              </Callout.Icon>
+              <Callout.Text>
+                <Text size="1">{error}</Text>
+              </Callout.Text>
+            </Callout.Root>
           )}
           
           {success && !error && (
-            <Text size="1" color="green">
-              {success}
-            </Text>
+            <Callout.Root color="green" size="1">
+              <Callout.Icon>
+                <CheckIcon />
+              </Callout.Icon>
+              <Callout.Text>
+                <Text size="1">{success}</Text>
+              </Callout.Text>
+            </Callout.Root>
           )}
           
           {helperText && !error && !success && (
@@ -442,17 +472,27 @@ export function EnhancedSwitch({
       </Flex>
       
       {(error || success || helperText) && (
-        <Box>
+        <Box mt="1"> {/* Added small margin for spacing from switch line */}
           {error && (
-            <Text size="1" color="red">
-              {error}
-            </Text>
+            <Callout.Root color="red" size="1">
+              <Callout.Icon>
+                <ExclamationTriangleIcon />
+              </Callout.Icon>
+              <Callout.Text>
+                <Text size="1">{error}</Text>
+              </Callout.Text>
+            </Callout.Root>
           )}
           
           {success && !error && (
-            <Text size="1" color="green">
-              {success}
-            </Text>
+            <Callout.Root color="green" size="1">
+              <Callout.Icon>
+                <CheckIcon />
+              </Callout.Icon>
+              <Callout.Text>
+                <Text size="1">{success}</Text>
+              </Callout.Text>
+            </Callout.Root>
           )}
           
           {helperText && !error && !success && (

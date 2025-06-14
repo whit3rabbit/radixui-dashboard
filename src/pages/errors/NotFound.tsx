@@ -58,11 +58,12 @@ export default function NotFound() {
   };
 
   return (
-    <Container size="2" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center' }}>
-      <Flex direction="column" align="center" gap="6" style={{ width: '100%', textAlign: 'center' }}>
-        {/* 404 Illustration */}
-        <Box>
-          <Text size="9" weight="bold" style={{ fontSize: '120px', color: 'var(--gray-9)' }}>
+    <Flex align="center" justify="center" style={{ minHeight: '100vh' }}>
+      <Container size="2">
+        <Flex direction="column" align="center" gap="6" style={{ width: '100%' }}> {/* Removed textAlign: 'center' */}
+          {/* 404 Illustration */}
+          <Box>
+            <Text size="9" weight="bold" style={{ fontSize: '120px', color: 'var(--gray-9)' }} align="center"> {/* Added align="center" to Text */}
             404
           </Text>
         </Box>
@@ -76,7 +77,7 @@ export default function NotFound() {
         </Flex>
 
         {/* Search Bar */}
-        <Card style={{ width: '100%', maxWidth: '500px' }}>
+        <Card width="100%" maxWidth="500px">
           <form onSubmit={handleSearchSubmit}>
             <Flex gap="2">
               <TextField.Root
@@ -104,7 +105,7 @@ export default function NotFound() {
           </Text>
           <Flex gap="3" wrap="wrap" justify="center">
             {popularLinks.map((link) => (
-              <Link key={link.href} to={link.href} style={{ textDecoration: 'none' }}>
+              <Link key={link.href} to={link.href} asChild>
                 <Button variant="soft" size="2">
                   {link.icon}
                   {link.title}
@@ -116,7 +117,7 @@ export default function NotFound() {
 
         {/* Back to Dashboard */}
         <Flex gap="3" mt="4">
-          <Link to="/dashboard">
+          <Link to="/dashboard" asChild>
             <Button size="3">
               <HomeIcon />
               Back to Dashboard
@@ -126,7 +127,8 @@ export default function NotFound() {
             Go Back
           </Button>
         </Flex>
-      </Flex>
-    </Container>
+        </Flex>
+      </Container>
+    </Flex>
   )
 }

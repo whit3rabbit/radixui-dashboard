@@ -253,11 +253,11 @@ export default function Profile() {
                         <IconButton
                           size="1"
                           variant="solid"
+                          radius="full" // borderRadius: '50%'
                           style={{
                             position: 'absolute',
                             bottom: 0,
                             right: 0,
-                            borderRadius: '50%',
                           }}
                         >
                           <CameraIcon />
@@ -504,7 +504,7 @@ export default function Profile() {
                           Delete Account
                         </Button>
                       </AlertDialog.Trigger>
-                      <AlertDialog.Content style={{ maxWidth: 450 }}>
+                      <AlertDialog.Content maxWidth="450px">
                         <AlertDialog.Title>Delete Account</AlertDialog.Title>
                         <AlertDialog.Description size="2">
                           Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.

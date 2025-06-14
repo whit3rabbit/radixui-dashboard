@@ -172,27 +172,27 @@ export function NotificationCenter() {
             <Badge 
               color="red" 
               variant="solid"
-              size="1"
+              size="1" // Radix size "1" is typically small
               style={{
                 position: 'absolute',
-                top: '-4px',
-                right: '-4px',
-                minWidth: '18px',
-                height: '18px',
-                borderRadius: '9px',
+                top: '-5px', // Adjusted for better visual alignment with typical icon sizes
+                right: '-5px', // Adjusted for better visual alignment
+                // minWidth: '18px', // Let Radix Badge size prop handle this
+                // height: '18px', // Let Radix Badge size prop handle this
+                borderRadius: 'var(--radius-full)', // Make it a circle
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '11px'
+                // fontSize: '11px' // Rely on Badge's default font size for its "size" prop
               }}
             >
-              {unreadCount}
+              {unreadCount > 9 ? '9+' : unreadCount} {/* Common practice for counts in badges */}
             </Badge>
           )}
         </Box>
       </DropdownMenu.Trigger>
 
-      <DropdownMenu.Content style={{ width: '360px', padding: 0 }}>
+      <DropdownMenu.Content width="360px" p="0">
         <Box p="3">
           <Flex justify="between" align="center">
             <Text size="3" weight="medium">Notifications</Text>
@@ -206,7 +206,7 @@ export function NotificationCenter() {
         
         <Separator />
         
-        <ScrollArea style={{ height: '400px' }}>
+        <ScrollArea height="400px">
           {notifications.length === 0 ? (
             <Flex align="center" justify="center" p="6">
               <Text color="gray" size="2">No notifications</Text>
@@ -231,7 +231,7 @@ export function NotificationCenter() {
                           {notification.title}
                         </Text>
                         {!notification.read && (
-                          <DotFilledIcon color="blue" />
+                          <DotFilledIcon style={{ color: 'var(--blue-9)' }} />
                         )}
                       </Flex>
                       <Text size="1" color="gray">
@@ -280,7 +280,7 @@ export function NotificationCenter() {
           <>
             <Separator />
             <Box p="3">
-              <Button size="2" variant="soft" style={{ width: '100%' }} onClick={clearAll}>
+              <Button size="2" variant="soft" width="100%" onClick={clearAll}>
                 Clear all notifications
               </Button>
             </Box>

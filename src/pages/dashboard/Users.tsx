@@ -587,37 +587,37 @@ export default function Users() {
                 <Card>
                   <Heading size="4" mb="4">Permissions Matrix</Heading>
                   <Box style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                      <thead>
-                        <tr>
-                          <th style={{ padding: '8px', textAlign: 'left', borderBottom: '1px solid var(--gray-6)' }}>
+                    <Table.Root variant="surface">
+                      <Table.Header>
+                        <Table.Row>
+                          <Table.ColumnHeaderCell>
                             Permission
-                          </th>
+                          </Table.ColumnHeaderCell>
                           {roles.map((role) => (
-                            <th key={role.id} style={{ padding: '8px', textAlign: 'center', borderBottom: '1px solid var(--gray-6)' }}>
+                            <Table.ColumnHeaderCell key={role.id} style={{ textAlign: 'center' }}>
                               {role.name}
-                            </th>
+                            </Table.ColumnHeaderCell>
                           ))}
-                        </tr>
-                      </thead>
-                      <tbody>
+                        </Table.Row>
+                      </Table.Header>
+                      <Table.Body>
                         {allPermissions.map((permission) => (
-                          <tr key={permission.id}>
-                            <td style={{ padding: '8px', borderBottom: '1px solid var(--gray-4)' }}>
+                          <Table.Row key={permission.id}>
+                            <Table.Cell>
                               <Text size="2">{permission.name}</Text>
                               <Text size="1" color="gray"> ({permission.category})</Text>
-                            </td>
+                            </Table.Cell>
                             {roles.map((role) => (
-                              <td key={role.id} style={{ padding: '8px', textAlign: 'center', borderBottom: '1px solid var(--gray-4)' }}>
+                              <Table.Cell key={role.id} style={{ textAlign: 'center' }}>
                                 {role.permissions.includes(permission.id) && (
-                                  <CheckCircledIcon color="green" />
+                                  <CheckCircledIcon style={{ color: 'var(--green-9)' }} />
                                 )}
-                              </td>
+                              </Table.Cell>
                             ))}
-                          </tr>
+                          </Table.Row>
                         ))}
-                      </tbody>
-                    </table>
+                      </Table.Body>
+                    </Table.Root>
                   </Box>
                 </Card>
               </Flex>
@@ -658,7 +658,7 @@ export default function Users() {
 
       {/* User Dialog */}
       <Dialog.Root open={showUserDialog} onOpenChange={setShowUserDialog}>
-        <Dialog.Content style={{ maxWidth: 500 }}>
+        <Dialog.Content maxWidth="500px">
           <Dialog.Title>
             {editingUser ? 'Edit User' : 'Create New User'}
           </Dialog.Title>
@@ -749,7 +749,7 @@ export default function Users() {
 
       {/* Bulk Import Dialog */}
       <Dialog.Root open={showBulkImport} onOpenChange={setShowBulkImport}>
-        <Dialog.Content style={{ maxWidth: 600 }}>
+        <Dialog.Content maxWidth="600px">
           <Dialog.Title>Import Users</Dialog.Title>
           <Dialog.Description size="2" mb="4">
             Upload a CSV file to import multiple users at once

@@ -406,7 +406,7 @@ export default function Tracking() {
               <Text size="2" color="gray">Online Systems</Text>
               <Flex align="center" gap="2">
                 <Text size="6" weight="bold" color="green">{onlineCount}</Text>
-                <CheckCircledIcon color="green" />
+                <CheckCircledIcon style={{ color: 'var(--green-9)' }} />
               </Flex>
             </Flex>
           </Card>
@@ -415,7 +415,7 @@ export default function Tracking() {
               <Text size="2" color="gray">Offline Systems</Text>
               <Flex align="center" gap="2">
                 <Text size="6" weight="bold" color="red">{offlineCount}</Text>
-                <CrossCircledIcon color="red" />
+                <CrossCircledIcon style={{ color: 'var(--red-9)' }} />
               </Flex>
             </Flex>
           </Card>
@@ -424,7 +424,7 @@ export default function Tracking() {
               <Text size="2" color="gray">Warnings</Text>
               <Flex align="center" gap="2">
                 <Text size="6" weight="bold" color="orange">{warningCount}</Text>
-                <ExclamationTriangleIcon color="orange" />
+                <ExclamationTriangleIcon style={{ color: 'var(--orange-9)' }} />
               </Flex>
             </Flex>
           </Card>
@@ -447,7 +447,7 @@ export default function Tracking() {
                 placeholder="Search by name or IP..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                style={{ minWidth: '200px' }}
+                minWidth="200px"
               >
                 <TextField.Slot>
                   <MagnifyingGlassIcon />
@@ -605,24 +605,24 @@ export default function Tracking() {
         ) : (
           <Card>
             <Box style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid var(--gray-6)' }}>
-                    <th style={{ padding: '12px', textAlign: 'left' }}>System</th>
-                    <th style={{ padding: '12px', textAlign: 'left' }}>Status</th>
-                    <th style={{ padding: '12px', textAlign: 'left' }}>OS</th>
-                    <th style={{ padding: '12px', textAlign: 'left' }}>Department</th>
-                    <th style={{ padding: '12px', textAlign: 'left' }}>CPU</th>
-                    <th style={{ padding: '12px', textAlign: 'left' }}>Memory</th>
-                    <th style={{ padding: '12px', textAlign: 'left' }}>Disk</th>
-                    <th style={{ padding: '12px', textAlign: 'left' }}>Uptime</th>
-                    <th style={{ padding: '12px', textAlign: 'left' }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <Table.Root variant="surface">
+                <Table.Header>
+                  <Table.Row>
+                    <Table.ColumnHeaderCell>System</Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>OS</Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>Department</Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>CPU</Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>Memory</Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>Disk</Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>Uptime</Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>Actions</Table.ColumnHeaderCell>
+                  </Table.Row>
+                </Table.Header>
+                <Table.Body>
                   {filteredSystems.map((system) => (
-                    <tr key={system.id} style={{ borderBottom: '1px solid var(--gray-4)' }}>
-                      <td style={{ padding: '12px' }}>
+                    <Table.Row key={system.id}>
+                      <Table.Cell>
                         <Flex align="center" gap="2">
                           {getSystemIcon(system.type)}
                           <Box>
@@ -630,37 +630,37 @@ export default function Tracking() {
                             <Text size="1" color="gray">{system.ipAddress}</Text>
                           </Box>
                         </Flex>
-                      </td>
-                      <td style={{ padding: '12px' }}>
+                      </Table.Cell>
+                      <Table.Cell>
                         <Badge color={getStatusColor(system.status)} variant="soft">
                           {system.status}
                         </Badge>
-                      </td>
-                      <td style={{ padding: '12px' }}>
+                      </Table.Cell>
+                      <Table.Cell>
                         <Text size="2">{system.os} {system.osVersion}</Text>
-                      </td>
-                      <td style={{ padding: '12px' }}>
+                      </Table.Cell>
+                      <Table.Cell>
                         <Text size="2">{system.department}</Text>
-                      </td>
-                      <td style={{ padding: '12px' }}>
+                      </Table.Cell>
+                      <Table.Cell>
                         <Text size="2" color={getUsageColor(system.cpuUsage) as any}>
                           {system.cpuUsage}%
                         </Text>
-                      </td>
-                      <td style={{ padding: '12px' }}>
+                      </Table.Cell>
+                      <Table.Cell>
                         <Text size="2" color={getUsageColor(system.memoryUsage) as any}>
                           {system.memoryUsage}%
                         </Text>
-                      </td>
-                      <td style={{ padding: '12px' }}>
+                      </Table.Cell>
+                      <Table.Cell>
                         <Text size="2" color={getUsageColor(system.diskUsage) as any}>
                           {system.diskUsage}%
                         </Text>
-                      </td>
-                      <td style={{ padding: '12px' }}>
+                      </Table.Cell>
+                      <Table.Cell>
                         <Text size="2">{formatUptime(system.uptime)}</Text>
-                      </td>
-                      <td style={{ padding: '12px' }}>
+                      </Table.Cell>
+                      <Table.Cell>
                         <DropdownMenu.Root>
                           <DropdownMenu.Trigger>
                             <IconButton size="1" variant="ghost">
@@ -682,11 +682,11 @@ export default function Tracking() {
                             </DropdownMenu.Item>
                           </DropdownMenu.Content>
                         </DropdownMenu.Root>
-                      </td>
-                    </tr>
+                      </Table.Cell>
+                    </Table.Row>
                   ))}
-                </tbody>
-              </table>
+                </Table.Body>
+              </Table.Root>
             </Box>
           </Card>
         )}

@@ -427,7 +427,7 @@ export default function Transactions() {
               </Select.Root>
             </Box>
             
-            <Box style={{ flex: 1, minWidth: '200px' }}>
+            <Box style={{ flex: 1 }} minWidth="200px">
               <Text size="2" weight="medium" mb="1">Amount Range</Text>
               <Flex gap="2">
                 <TextField.Root placeholder="Min" type="number" />
@@ -453,7 +453,7 @@ export default function Transactions() {
 
       {/* Share Dialog */}
       <Dialog.Root open={showShareDialog} onOpenChange={setShowShareDialog}>
-        <Dialog.Content style={{ maxWidth: 450 }}>
+        <Dialog.Content maxWidth="450px">
           <Dialog.Title>Share Transactions</Dialog.Title>
           <Dialog.Description size="2" mb="4">
             Share this transaction report with others via a secure link.
@@ -507,7 +507,7 @@ export default function Transactions() {
 
       {/* Transaction Details Dialog */}
       <Dialog.Root open={!!selectedTransaction} onOpenChange={(open) => !open && setSelectedTransaction(null)}>
-        <Dialog.Content style={{ maxWidth: 500 }}>
+        <Dialog.Content maxWidth="500px">
           <Dialog.Title>Transaction Details</Dialog.Title>
           
           {selectedTransaction && (

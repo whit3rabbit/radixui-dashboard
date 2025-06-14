@@ -81,21 +81,22 @@ export default function Login() {
   };
 
   return (
-    <Container size="1" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+    <Flex align="center" justify="center" style={{ minHeight: '100vh', position: 'relative' }}>
       {/* Theme Toggle */}
       <IconButton 
         size="3" 
         variant="ghost" 
         onClick={toggleTheme}
-        style={{ position: 'absolute', top: '20px', right: '20px' }}
+        style={{ position: 'absolute', top: '20px', right: '20px' }} // Absolute positioning fine here
       >
         {theme === 'light' ? <MoonIcon /> : <SunIcon />}
       </IconButton>
       
-      <Card size="4" style={{ width: '100%', maxWidth: '400px' }}>
-        <form onSubmit={handleSubmit}>
-          <Flex direction="column" gap="4">
-            <Flex direction="column" align="center" gap="2" mb="4">
+      <Container size="1"> {/* Container for width constraint */}
+        <Card size="4" style={{ width: '100%' }} maxWidth="400px"> {/* Card takes full width of container, but max width */}
+          <form onSubmit={handleSubmit}>
+            <Flex direction="column" gap="4">
+              <Flex direction="column" align="center" gap="2" mb="4">
               <Heading size="6">Welcome back</Heading>
               <Text color="gray">Sign in to your account</Text>
             </Flex>
@@ -111,7 +112,7 @@ export default function Login() {
 
             <Flex direction="column" gap="3">
               <Box>
-                <Text size="2" weight="medium" style={{ display: 'block', marginBottom: '4px' }}>
+                <Text as="div" size="2" weight="medium" mb="1"> {/* display: 'block', marginBottom: '4px' */}
                   Email
                 </Text>
                 <TextField.Root 
@@ -136,8 +137,8 @@ export default function Login() {
                   <Text size="2" weight="medium">
                     Password
                   </Text>
-                  <Link to="/forgot-password">
-                    <Text size="1" color="gray">Forgot password?</Text>
+                  <Link to="/forgot-password" asChild>
+                    <Text size="1" color="gray" style={{ cursor: 'pointer' }}>Forgot password?</Text>
                   </Link>
                 </Flex>
                 <TextField.Root 
@@ -168,7 +169,7 @@ export default function Login() {
               </Box>
             </Flex>
 
-            <Button size="3" style={{ marginTop: '8px' }} type="submit" loading={isLoading}>
+            <Button size="3" mt="2" type="submit" loading={isLoading}> {/* marginTop: '8px' -> mt="2" */}
               Sign In
             </Button>
 
@@ -187,15 +188,16 @@ export default function Login() {
               <Text size="2" color="gray">
                 Don't have an account?
               </Text>
-              <Link to="/register">
-                <Text size="2" color="blue" style={{ textDecoration: 'none' }}>
+              <Link to="/register" asChild>
+                <Text size="2" color="blue" style={{ cursor: 'pointer' }}> {/* Removed textDecoration, added cursor */}
                   Sign up
                 </Text>
               </Link>
             </Flex>
           </Flex>
         </form>
-      </Card>
-    </Container>
+        </Card>
+      </Container>
+    </Flex>
   )
 }
