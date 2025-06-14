@@ -918,7 +918,7 @@ export default function Settings() {
 
       {/* Create API Key Dialog */}
       <Dialog.Root open={showApiKeyDialog} onOpenChange={setShowApiKeyDialog}>
-        <Dialog.Content style={{ maxWidth: 450 }}>
+        <Dialog.Content maxWidth="450px">
           <Dialog.Title>Create API Key</Dialog.Title>
           <Dialog.Description size="2" mb="4">
             Create a new API key for accessing the API programmatically.
@@ -942,7 +942,7 @@ export default function Settings() {
 
       {/* Add Webhook Dialog */}
       <Dialog.Root open={showWebhookDialog} onOpenChange={setShowWebhookDialog}>
-        <Dialog.Content style={{ maxWidth: 450 }}>
+        <Dialog.Content maxWidth="450px">
           <Dialog.Title>Add Webhook</Dialog.Title>
           <Dialog.Description size="2" mb="4">
             Configure a new webhook endpoint to receive event notifications.

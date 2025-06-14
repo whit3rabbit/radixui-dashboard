@@ -82,7 +82,7 @@ function ThemePreview({ theme, isSelected, onClick }: ThemePreviewProps) {
           <Box 
             style={{
               height: '60px',
-              borderRadius: '6px',
+              borderRadius: 'var(--radius-3)', // 6px
               background: theme.preview.background,
               border: '1px solid var(--gray-6)',
               position: 'relative',
@@ -102,7 +102,7 @@ function ThemePreview({ theme, isSelected, onClick }: ThemePreviewProps) {
                 style={{
                   width: '8px',
                   height: '8px',
-                  borderRadius: '50%',
+                  borderRadius: 'var(--radius-round)', // 50%
                   background: theme.preview.primary
                 }}
               />
@@ -110,7 +110,7 @@ function ThemePreview({ theme, isSelected, onClick }: ThemePreviewProps) {
                 style={{
                   flex: 1,
                   height: '4px',
-                  borderRadius: '2px',
+                  borderRadius: 'var(--radius-1)', // 2px
                   background: theme.preview.secondary,
                   marginTop: '2px'
                 }}
@@ -124,7 +124,7 @@ function ThemePreview({ theme, isSelected, onClick }: ThemePreviewProps) {
                 left: '8px',
                 right: '8px',
                 height: '16px',
-                borderRadius: '4px',
+                borderRadius: 'var(--radius-2)', // 4px
                 background: theme.preview.secondary
               }}
             />
@@ -193,7 +193,7 @@ export function ThemeSelector({ trigger }: ThemeSelectorProps) {
         {trigger || defaultTrigger}
       </Dialog.Trigger>
       
-      <Dialog.Content size="3" style={{ maxWidth: '600px' }}>
+      <Dialog.Content size="3" maxWidth="600px">
         <Dialog.Title>Choose Theme</Dialog.Title>
         <Dialog.Description size="2" mb="4">
           Select a theme that matches your preference. Your selection will be saved automatically.

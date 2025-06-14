@@ -117,21 +117,22 @@ export default function Register() {
   };
 
   return (
-    <Container size="1" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+    <Flex align="center" justify="center" style={{ minHeight: '100vh', position: 'relative' }}>
       {/* Theme Toggle */}
       <IconButton 
         size="3" 
         variant="ghost" 
         onClick={toggleTheme}
-        style={{ position: 'absolute', top: '20px', right: '20px' }}
+        style={{ position: 'absolute', top: '20px', right: '20px' }} // Absolute positioning fine here
       >
         {theme === 'light' ? <MoonIcon /> : <SunIcon />}
       </IconButton>
       
-      <Card size="4" style={{ width: '100%', maxWidth: '400px' }}>
-        <form onSubmit={handleSubmit}>
-          <Flex direction="column" gap="4">
-            <Flex direction="column" align="center" gap="2" mb="4">
+      <Container size="1"> {/* Container for width constraint */}
+        <Card size="4" width="100%" maxWidth="400px"> {/* Card takes full width of container, but max width */}
+          <form onSubmit={handleSubmit}>
+            <Flex direction="column" gap="4">
+              <Flex direction="column" align="center" gap="2" mb="4">
               <Heading size="6">Create account</Heading>
               <Text color="gray">Get started with your free account</Text>
             </Flex>
@@ -147,7 +148,7 @@ export default function Register() {
 
             <Flex direction="column" gap="3">
               <Box>
-                <Text size="2" weight="medium" style={{ display: 'block', marginBottom: '4px' }}>
+                <Text as="div" size="2" weight="medium" mb="1"> {/* display: 'block', marginBottom: '4px' */}
                   Full Name
                 </Text>
                 <TextField.Root 
@@ -167,7 +168,7 @@ export default function Register() {
               </Box>
 
               <Box>
-                <Text size="2" weight="medium" style={{ display: 'block', marginBottom: '4px' }}>
+                <Text as="div" size="2" weight="medium" mb="1"> {/* display: 'block', marginBottom: '4px' */}
                   Email
                 </Text>
                 <TextField.Root 
@@ -188,7 +189,7 @@ export default function Register() {
               </Box>
 
               <Box>
-                <Text size="2" weight="medium" style={{ display: 'block', marginBottom: '4px' }}>
+                <Text as="div" size="2" weight="medium" mb="1"> {/* display: 'block', marginBottom: '4px' */}
                   Password
                 </Text>
                 <TextField.Root 
@@ -220,7 +221,7 @@ export default function Register() {
               </Box>
 
               <Box>
-                <Text size="2" weight="medium" style={{ display: 'block', marginBottom: '4px' }}>
+                <Text as="div" size="2" weight="medium" mb="1"> {/* display: 'block', marginBottom: '4px' */}
                   Confirm Password
                 </Text>
                 <TextField.Root 
@@ -257,8 +258,8 @@ export default function Register() {
                 />
                 <Text size="2">
                   I agree to the{' '}
-                  <Link to="/terms" style={{ textDecoration: 'none' }}>
-                    <Text size="2" color="blue">Terms and Conditions</Text>
+                  <Link to="/terms" asChild>
+                    <Text size="2" color="blue" style={{ cursor: 'pointer' }}>Terms and Conditions</Text>
                   </Link>
                 </Text>
               </Flex>
@@ -267,7 +268,7 @@ export default function Register() {
               )}
             </Flex>
 
-            <Button size="3" style={{ marginTop: '8px' }} type="submit" loading={isLoading}>
+            <Button size="3" mt="2" type="submit" loading={isLoading}> {/* marginTop: '8px' -> mt="2" */}
               Create Account
             </Button>
 
@@ -286,15 +287,16 @@ export default function Register() {
               <Text size="2" color="gray">
                 Already have an account?
               </Text>
-              <Link to="/login">
-                <Text size="2" color="blue" style={{ textDecoration: 'none' }}>
+              <Link to="/login" asChild>
+                <Text size="2" color="blue" style={{ cursor: 'pointer' }}> {/* Removed textDecoration, added cursor */}
                   Sign in
                 </Text>
               </Link>
             </Flex>
           </Flex>
         </form>
-      </Card>
-    </Container>
+        </Card>
+      </Container>
+    </Flex>
   )
 }

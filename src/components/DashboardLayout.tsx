@@ -44,15 +44,15 @@ export default function DashboardLayout() {
   return (
     <Flex style={{ minHeight: '100vh' }}>
       {/* Sidebar */}
-      <Box style={{ width: '250px', backgroundColor: 'var(--gray-2)', borderRight: '1px solid var(--gray-6)' }}>
-        <Card style={{ height: '100%', border: 'none', borderRadius: 0 }}>
+      <Box width="250px" style={{ backgroundColor: 'var(--gray-2)', borderRight: '1px solid var(--gray-6)' }}>
+        <Card radius="none" style={{ height: '100%', border: 'none' }}>
           <Box p="4" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <Text size="5" weight="bold" style={{ display: 'block', marginBottom: '24px' }}>
               Dashboard
             </Text>
             
             <Flex direction="column" gap="2" style={{ flex: 1 }}>
-              <Link to="/dashboard" style={{ textDecoration: 'none' }}>
+              <Link to="/dashboard" asChild>
                 <SidebarItem 
                   icon={<DashboardIcon />} 
                   label="Overview" 
@@ -60,7 +60,7 @@ export default function DashboardLayout() {
                 />
               </Link>
               
-              <Link to="/dashboard/forms" style={{ textDecoration: 'none' }}>
+              <Link to="/dashboard/forms" asChild>
                 <SidebarItem 
                   icon={<ComponentPlaceholderIcon />} 
                   label="Forms" 
@@ -70,42 +70,42 @@ export default function DashboardLayout() {
               
               <Separator my="3" />
               
-              <Link to="/dashboard/users" style={{ textDecoration: 'none' }}>
+              <Link to="/dashboard/users" asChild>
                 <SidebarItem 
                   icon={<PeopleIcon />} 
                   label="Users" 
                   active={location.pathname === '/dashboard/users'}
                 />
               </Link>
-              <Link to="/dashboard/products" style={{ textDecoration: 'none' }}>
+              <Link to="/dashboard/products" asChild>
                 <SidebarItem 
                   icon={<CubeIcon />} 
                   label="Products" 
                   active={location.pathname === '/dashboard/products'}
                 />
               </Link>
-              <Link to="/dashboard/orders" style={{ textDecoration: 'none' }}>
+              <Link to="/dashboard/orders" asChild>
                 <SidebarItem 
                   icon={<ReaderIcon />} 
                   label="Orders" 
                   active={location.pathname === '/dashboard/orders'}
                 />
               </Link>
-              <Link to="/dashboard/transactions" style={{ textDecoration: 'none' }}>
+              <Link to="/dashboard/transactions" asChild>
                 <SidebarItem 
                   icon={<ActivityLogIcon />} 
                   label="Transactions" 
                   active={location.pathname === '/dashboard/transactions'}
                 />
               </Link>
-              <Link to="/dashboard/analytics" style={{ textDecoration: 'none' }}>
+              <Link to="/dashboard/analytics" asChild>
                 <SidebarItem 
                   icon={<BarChartIcon />} 
                   label="Analytics" 
                   active={location.pathname === '/dashboard/analytics'}
                 />
               </Link>
-              <Link to="/dashboard/tracking" style={{ textDecoration: 'none' }}>
+              <Link to="/dashboard/tracking" asChild>
                 <SidebarItem 
                   icon={<RocketIcon />} 
                   label="Tracking" 
@@ -115,26 +115,29 @@ export default function DashboardLayout() {
               
               <Separator my="3" />
               
+              {/* These items are not links, so they don't need asChild. They might be placeholders or trigger other actions. */}
               <SidebarItem icon={<FileTextIcon />} label="Projects" />
               <SidebarItem icon={<ChatBubbleIcon />} label="Messages" />
               <SidebarItem icon={<PersonIcon />} label="Team" />
               
               <Separator my="3" />
               
-              <Link to="/dashboard/settings" style={{ textDecoration: 'none' }}>
+              <Link to="/dashboard/settings" asChild>
                 <SidebarItem 
                   icon={<GearIcon />} 
                   label="Settings" 
                   active={location.pathname === '/dashboard/settings'}
                 />
               </Link>
+              {/* This item is not a link. */}
               <SidebarItem icon={<QuestionMarkCircledIcon />} label="Help" />
               
-              <Box style={{ flex: 1 }} />
+              <Box style={{ flex: 1 }} /> {/* Spacer */}
               
               <Separator my="3" />
               
-              <Box onClick={handleLogout}>
+              {/* This is an onClick handler on a Box. Added cursor: pointer for better UX. */}
+              <Box onClick={handleLogout} style={{ cursor: 'pointer' }}>
                 <SidebarItem icon={<ExitIcon />} label="Logout" />
               </Box>
             </Flex>
@@ -198,34 +201,38 @@ export default function DashboardLayout() {
  * @property {string} label - The text label for the sidebar item.
  * @property {boolean} [active=false] - Whether the sidebar item is currently active.
  */
-interface SidebarItemProps {
-  icon: React.ReactNode
-  label: string
-  active?: boolean
+interface SidebarItemProps extends Omit<React.ComponentPropsWithoutRef<typeof Flex>, 'children'> {
+  icon: React.ReactNode;
+  label: string;
+  active?: boolean;
 }
 
 /**
  * @function SidebarItem
  * @description A component to render individual items in the sidebar.
+ * It's designed to be used with `asChild` prop from `Link` components.
  * @param {SidebarItemProps} props - The props for the SidebarItem component.
  * @returns {JSX.Element} The rendered sidebar item.
  */
-function SidebarItem({ icon, label, active = false }: SidebarItemProps) {
+function SidebarItem({ icon, label, active = false, style, ...props }: SidebarItemProps) {
   return (
     <Flex
       align="center"
       gap="3"
       p="2"
       style={{
-        borderRadius: '6px',
-        cursor: 'pointer',
-        backgroundColor: active ? 'var(--gray-4)' : 'transparent',
-        transition: 'background-color 0.15s ease'
+        borderRadius: 'var(--radius-3)', // Using Radix token for 6px radius
+        backgroundColor: active ? 'var(--accent-a4)' : 'transparent', // Using accent alpha color for active state
+        transition: 'background-color 0.15s ease',
+        textDecoration: 'none', // Ensure no underline from link
+        color: 'inherit', // Ensure text color inherits correctly
+        ...style,
       }}
-      className="sidebar-item"
+      className="sidebar-item" // Retained for any specific CSS hover effects not covered by Radix
+      {...props} // Spread props from Link (e.g., href, onClick)
     >
       {icon}
       <Text size="2" weight="medium">{label}</Text>
     </Flex>
-  )
+  );
 }

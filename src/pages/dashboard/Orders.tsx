@@ -440,7 +440,7 @@ export default function Orders() {
 
       {/* Order Details Dialog */}
       <Dialog.Root open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <Dialog.Content style={{ maxWidth: 600 }}>
+        <Dialog.Content maxWidth="600px">
           <Dialog.Title>Order Details</Dialog.Title>
           
           {selectedOrder && (
@@ -491,7 +491,7 @@ export default function Orders() {
 
               <Card mb="4">
                 <Heading size="3" mb="3">Order Items</Heading>
-                <ScrollArea style={{ maxHeight: '200px' }}>
+                <ScrollArea maxHeight="200px">
                   <Flex direction="column" gap="2">
                     {selectedOrder.items.map((item, index) => (
                       <Box key={item.id}>

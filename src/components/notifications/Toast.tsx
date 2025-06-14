@@ -54,13 +54,13 @@ export function Toast() {
 
   return (
     <Box
+      position="fixed"
       style={{
-        position: 'fixed',
-        top: '20px',
-        right: '20px',
-        zIndex: 1000,
-        maxWidth: '400px'
+        top: '20px', // Fine in style
+        right: '20px', // Fine in style
+        zIndex: 1000, // Fine in style
       }}
+      maxWidth="400px"
     >
       <Flex direction="column" gap="2">
         {toasts.map((toast) => (
@@ -100,10 +100,10 @@ function ToastItem({ toast, onClose }: ToastItemProps) {
 
   return (
     <Card
+      minWidth="300px"
       style={{
-        minWidth: '300px',
-        animation: 'slideIn 0.3s ease-out',
-        boxShadow: 'var(--shadow-5)'
+        animation: 'slideIn 0.3s ease-out', // Custom animation
+        boxShadow: 'var(--shadow-5)' // Radix shadow token
       }}
     >
       <Flex gap="3" align="start">
@@ -116,7 +116,7 @@ function ToastItem({ toast, onClose }: ToastItemProps) {
             {toast.title}
           </Text>
           {toast.description && (
-            <Text size="2" color="gray" style={{ marginTop: '4px' }}>
+            <Text size="2" color="gray" mt="1"> {/* marginTop: '4px' -> mt="1" */}
               {toast.description}
             </Text>
           )}
@@ -126,7 +126,7 @@ function ToastItem({ toast, onClose }: ToastItemProps) {
               variant="ghost"
               color={color as any}
               onClick={toast.action.onClick}
-              style={{ marginTop: '8px' }}
+              mt="2" // marginTop: '8px' -> mt="2"
             >
               {toast.action.label}
             </Button>

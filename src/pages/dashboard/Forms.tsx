@@ -176,7 +176,7 @@ export default function Forms() {
                 placeholder="Enter your message..."
                 value={textAreaValue}
                 onChange={(e) => setTextAreaValue(e.target.value)}
-                style={{ minHeight: 100 }}
+                minHeight="100px"
               />
               <Text size="1" color="gray" mt="1">
                 {textAreaValue.length}/500 characters
@@ -188,7 +188,7 @@ export default function Forms() {
               <TextArea 
                 placeholder="This textarea can be resized..."
                 resize="vertical"
-                style={{ minHeight: 100 }}
+                minHeight="100px"
               />
               <Text size="1" color="gray" mt="1">Drag corner to resize</Text>
             </Box>
@@ -379,10 +379,10 @@ export default function Forms() {
                   color={currentStep >= step ? 'blue' : 'gray'}
                   variant={currentStep === step ? 'solid' : 'soft'}
                   size="2"
+                  radius="full" // borderRadius: '50%'
                   style={{ 
                     width: '32px', 
                     height: '32px', 
-                    borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
@@ -405,7 +405,7 @@ export default function Forms() {
           </Flex>
 
           {/* Step Content */}
-          <Box style={{ minHeight: '200px' }}>
+          <Box minHeight="200px">
             {currentStep === 1 && (
               <Flex direction="column" gap="4">
                 <Heading size="3">Personal Information</Heading>
@@ -518,7 +518,7 @@ export default function Forms() {
             {/* Stacked Form */}
             <Box>
               <Text size="2" weight="medium" mb="3">Stacked Form</Text>
-              <Flex direction="column" gap="3" style={{ maxWidth: '400px' }}>
+              <Flex direction="column" gap="3" maxWidth="400px">
                 <Box>
                   <Text size="2" weight="medium" mb="1">Username</Text>
                   <TextField.Root placeholder="Enter username" />

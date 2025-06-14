@@ -177,10 +177,10 @@ export default function Analytics() {
                 </Flex>
               </Box>
               <Box
+                p="2" // padding: '8px'
+                radius="3" // borderRadius: '6px'
                 style={{
-                  padding: '8px',
-                  backgroundColor: 'var(--gray-3)',
-                  borderRadius: '6px'
+                  backgroundColor: 'var(--gray-3)', // Radix variable, fine in style
                 }}
               >
                 {metric.icon}

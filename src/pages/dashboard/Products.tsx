@@ -517,7 +517,7 @@ export default function Products() {
 
       {/* Create Product Dialog */}
       <Dialog.Root open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <Dialog.Content style={{ maxWidth: 450 }}>
+        <Dialog.Content maxWidth="450px">
           <Dialog.Title>Create New Product</Dialog.Title>
           <Dialog.Description size="2" mb="4">
             Add a new product to your catalog
@@ -619,7 +619,7 @@ export default function Products() {
                 placeholder="Enter product description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                style={{ minHeight: '80px' }}
+                minHeight="80px"
               />
             </Box>
           </Flex>
@@ -639,7 +639,7 @@ export default function Products() {
 
       {/* Edit Product Dialog */}
       <Dialog.Root open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <Dialog.Content style={{ maxWidth: 450 }}>
+        <Dialog.Content maxWidth="450px">
           <Dialog.Title>Edit Product</Dialog.Title>
           <Dialog.Description size="2" mb="4">
             Update product information
@@ -741,7 +741,7 @@ export default function Products() {
                 placeholder="Enter product description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                style={{ minHeight: '80px' }}
+                minHeight="80px"
               />
             </Box>
           </Flex>
@@ -761,7 +761,7 @@ export default function Products() {
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog.Root open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <AlertDialog.Content style={{ maxWidth: 450 }}>
+        <AlertDialog.Content maxWidth="450px">
           <AlertDialog.Title>Delete Product</AlertDialog.Title>
           <AlertDialog.Description size="2">
             Are you sure you want to delete "{selectedProduct?.name}"? This action cannot be undone.

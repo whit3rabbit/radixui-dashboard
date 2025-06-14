@@ -335,7 +335,7 @@ function DataTable<T extends Record<string, any>>({
           placeholder={searchPlaceholder}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          style={{ maxWidth: 300 }}
+          maxWidth="300px"
         >
           <TextField.Slot>
             <MagnifyingGlassIcon height="16" width="16" />
@@ -522,13 +522,13 @@ function DataTable<T extends Record<string, any>>({
 
       {/* Column Toggle Dialog */}
       <Dialog.Root open={showColumnDialog} onOpenChange={setShowColumnDialog}>
-        <Dialog.Content style={{ maxWidth: 450 }}>
+        <Dialog.Content maxWidth="450px">
           <Dialog.Title>Toggle Columns</Dialog.Title>
           <Dialog.Description size="2" mb="4">
             Show or hide columns in the table
           </Dialog.Description>
           
-          <ScrollArea style={{ height: 300 }}>
+          <ScrollArea height="300px">
             <Flex direction="column" gap="2">
               {columns.map(column => (
                 <Flex key={column.key as string} align="center" justify="between" p="2">

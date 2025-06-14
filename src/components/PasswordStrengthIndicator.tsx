@@ -53,7 +53,7 @@ export default function PasswordStrengthIndicator({ password }: PasswordStrength
               backgroundColor: index <= score 
                 ? `var(--${strengthColors[strength]}-9)` 
                 : 'var(--gray-6)',
-              borderRadius: '2px',
+              borderRadius: 'var(--radius-1)', // Assuming 2px maps to radius-1
               transition: 'background-color 0.3s ease'
             }}
           />

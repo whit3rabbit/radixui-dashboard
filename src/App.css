@@ -1,10 +1,22 @@
+/*
+  #root styles from default template - commented out.
+  Layout, max-width, padding, and text-alignment should be handled by Radix UI components
+  at the application or page level (e.g., using Container, Flex, Text components).
+*/
+/*
 #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
 }
+*/
 
+/*
+  Logo styles from default template - commented out.
+  These are likely unused in the current application.
+*/
+/*
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -32,11 +44,24 @@
     animation: logo-spin infinite 20s linear;
   }
 }
+*/
 
+/*
+  Generic .card styles from default template - commented out.
+  Radix Card component should be used, and its padding controlled by its props (e.g., size).
+*/
+/*
 .card {
   padding: 2em;
 }
+*/
 
+/*
+  .read-the-docs styles from default template - commented out.
+  Likely unused.
+*/
+/*
 .read-the-docs {
   color: #888;
 }
+*/
