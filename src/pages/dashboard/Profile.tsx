@@ -1,108 +1,206 @@
+/**
+ * @file Profile.tsx
+ * @description This file defines the User Profile page component for the dashboard.
+ * It allows users to manage their general profile information (name, email, avatar),
+ * change their password, update notification and appearance preferences, and delete their account.
+ * The page uses a tabbed interface to organize these settings.
+ */
 import { useState } from 'react'
 import { Card, Flex, Heading, Text, TextField, Button, Separator, Avatar, Box, Switch, Select, Tabs, Badge, Callout, AlertDialog, IconButton } from '@radix-ui/themes'
 import { PersonIcon, EnvelopeClosedIcon, LockClosedIcon, BellIcon, GlobeIcon, TrashIcon, ExclamationTriangleIcon, CheckCircledIcon, CameraIcon } from '@radix-ui/react-icons'
-import { useAuth } from '../../lib/auth-context'
-import { useTheme } from '../../lib/theme-context'
-import { validateEmail, validateName, validatePassword, validatePasswordMatch } from '../../lib/validation'
-import PasswordStrengthIndicator from '../../components/PasswordStrengthIndicator'
+import { useAuth } from '../../lib/auth-context' // Auth context for user data and actions
+import { useTheme } from '../../lib/theme-context' // Theme context for current theme info
+import { validateEmail, validateName, validatePassword, validatePasswordMatch } from '../../lib/validation' // Validation utilities
+import PasswordStrengthIndicator from '../../components/PasswordStrengthIndicator' // Component for password strength
 
+/**
+ * @typedef ProfileFormData
+ * @description Defines the structure for the user's general profile form data.
+ * @property {string} name - User's full name.
+ * @property {string} email - User's email address.
+ */
+type ProfileFormData = {
+  name: string;
+  email: string;
+};
+
+/**
+ * @typedef ProfileFormErrors
+ * @description Defines the structure for storing errors related to the profile form.
+ * @property {string} [name] - Error message for the name field.
+ * @property {string} [email] - Error message for the email field.
+ * @property {string} [general] - General error message (e.g., from API response).
+ */
+type ProfileFormErrors = {
+  name?: string;
+  email?: string;
+  general?: string;
+};
+
+/**
+ * @typedef PasswordFormData
+ * @description Defines the structure for the change password form data.
+ * @property {string} currentPassword - User's current password.
+ * @property {string} newPassword - User's desired new password.
+ * @property {string} confirmPassword - Confirmation of the new password.
+ */
+type PasswordFormData = {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+};
+
+/**
+ * @typedef PasswordFormErrors
+ * @description Defines the structure for storing errors related to the change password form.
+ * @property {string} [currentPassword] - Error message for the current password field.
+ * @property {string} [newPassword] - Error message for the new password field.
+ * @property {string} [confirmPassword] - Error message for the confirm password field.
+ * @property {string} [general] - General error message.
+ */
+type PasswordFormErrors = {
+  currentPassword?: string;
+  newPassword?: string;
+  confirmPassword?: string;
+  general?: string;
+};
+
+/**
+ * @typedef UserSettingsData
+ * @description Defines the structure for user preferences/settings.
+ * @property {boolean} emailNotifications - Whether email notifications are enabled.
+ * @property {boolean} marketingEmails - Whether marketing emails are enabled.
+ * @property {'system' | 'light' | 'dark'} themePreference - User's preferred theme.
+ * @property {string} language - User's preferred language (e.g., 'en', 'es').
+ */
+type UserSettingsData = {
+  emailNotifications: boolean;
+  marketingEmails: boolean;
+  themePreference: 'system' | 'light' | 'dark';
+  language: string;
+};
+
+/**
+ * @function Profile
+ * @description The main component for the User Profile page.
+ * It provides a tabbed interface for users to manage their account details,
+ * security settings, preferences, and account deletion.
+ * @returns {JSX.Element} The rendered Profile page.
+ */
 export default function Profile() {
-  const { user, updateProfile, logout } = useAuth()
-  const { theme } = useTheme()
-  
-  // Profile form state
-  const [profileData, setProfileData] = useState({
+  const { user, updateProfile, logout } = useAuth(); // Auth context for user data and actions
+  const { theme } = useTheme(); // Theme context to display current theme as info
+
+  // --- State for General Profile Information Form ---
+  const [profileData, setProfileData] = useState<ProfileFormData>({
     name: user?.name || '',
     email: user?.email || '',
-  })
-  const [profileLoading, setProfileLoading] = useState(false)
-  const [profileSuccess, setProfileSuccess] = useState(false)
-  const [profileErrors, setProfileErrors] = useState<{name?: string; email?: string; general?: string}>({})
-  
-  // Password form state
-  const [passwordData, setPasswordData] = useState({
+  });
+  const [profileLoading, setProfileLoading] = useState(false); // Loading state for profile update
+  const [profileSuccess, setProfileSuccess] = useState(false); // Success state for profile update
+  const [profileErrors, setProfileErrors] = useState<ProfileFormErrors>({}); // Errors for profile form
+
+  // --- State for Change Password Form ---
+  const [passwordData, setPasswordData] = useState<PasswordFormData>({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
-  })
-  const [passwordLoading, setPasswordLoading] = useState(false)
-  const [passwordSuccess, setPasswordSuccess] = useState(false)
-  const [passwordErrors, setPasswordErrors] = useState<{
-    currentPassword?: string;
-    newPassword?: string;
-    confirmPassword?: string;
-    general?: string;
-  }>({})
-  
-  // Settings state
-  const [settings, setSettings] = useState({
+  });
+  const [passwordLoading, setPasswordLoading] = useState(false); // Loading state for password change
+  const [passwordSuccess, setPasswordSuccess] = useState(false); // Success state for password change
+  const [passwordErrors, setPasswordErrors] = useState<PasswordFormErrors>({}); // Errors for password form
+
+  // --- State for User Preferences/Settings ---
+  const [settings, setSettings] = useState<UserSettingsData>({
     emailNotifications: true,
     marketingEmails: false,
-    themePreference: 'system' as 'system' | 'light' | 'dark',
-    language: 'en',
-  })
+    themePreference: 'system', // Default or load from user preferences via API
+    language: 'en', // Default or load from user preferences via API
+  });
 
+  /**
+   * @function handleProfileSubmit
+   * @description Handles submission of the general profile information form.
+   * Validates input and calls `updateProfile` from auth context.
+   * @param {React.FormEvent} e - The form submission event.
+   */
   const handleProfileSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    const nameError = validateName(profileData.name)
-    const emailError = validateEmail(profileData.email)
-    
+    e.preventDefault();
+    setProfileSuccess(false); // Reset success message on new submission
+
+    const nameError = validateName(profileData.name);
+    const emailError = validateEmail(profileData.email);
+
     if (nameError || emailError) {
       setProfileErrors({
         name: nameError || undefined,
         email: emailError || undefined,
-      })
-      return
+      });
+      return;
     }
-    
-    setProfileErrors({})
-    setProfileLoading(true)
-    setProfileSuccess(false)
-    
+
+    setProfileErrors({});
+    setProfileLoading(true);
+
+    // In a real app, avatar update would be handled separately, likely via file upload.
     const result = await updateProfile({
       name: profileData.name,
       email: profileData.email,
-    })
-    
-    setProfileLoading(false)
-    
-    if (result.success) {
-      setProfileSuccess(true)
-      setTimeout(() => setProfileSuccess(false), 3000)
-    } else {
-      setProfileErrors({ general: result.error })
-    }
-  }
+    });
 
+    setProfileLoading(false);
+
+    if (result.success) {
+      setProfileSuccess(true);
+      setTimeout(() => setProfileSuccess(false), 3000); // Hide success message after 3s
+    } else {
+      setProfileErrors({ general: result.error || 'Failed to update profile.' });
+    }
+  };
+
+  /**
+   * @function handlePasswordSubmit
+   * @description Handles submission of the change password form.
+   * Validates input and simulates an API call for password change.
+   * @param {React.FormEvent} e - The form submission event.
+   */
   const handlePasswordSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    const currentPasswordError = !passwordData.currentPassword ? 'Current password is required' : null
-    const newPasswordError = validatePassword(passwordData.newPassword)
-    const confirmPasswordError = validatePasswordMatch(passwordData.newPassword, passwordData.confirmPassword)
-    
+    e.preventDefault();
+    setPasswordSuccess(false); // Reset success message
+
+    const currentPasswordError = !passwordData.currentPassword ? 'Current password is required' : null;
+    const newPasswordError = validatePassword(passwordData.newPassword);
+    const confirmPasswordError = validatePasswordMatch(passwordData.newPassword, passwordData.confirmPassword);
+
     if (currentPasswordError || newPasswordError || confirmPasswordError) {
       setPasswordErrors({
         currentPassword: currentPasswordError || undefined,
         newPassword: newPasswordError || undefined,
         confirmPassword: confirmPasswordError || undefined,
-      })
-      return
+      });
+      return;
     }
-    
-    setPasswordErrors({})
-    setPasswordLoading(true)
-    setPasswordSuccess(false)
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    setPasswordLoading(false)
-    setPasswordSuccess(true)
-    setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
-    setTimeout(() => setPasswordSuccess(false), 3000)
-  }
+
+    setPasswordErrors({});
+    setPasswordLoading(true);
+
+    // TODO: Replace with actual API call to change password.
+    // This would typically involve sending currentPassword and newPassword.
+    // Example: const result = await authApi.changePassword(passwordData.currentPassword, passwordData.newPassword);
+    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API delay
+
+    setPasswordLoading(false);
+    // Assuming API call is successful for demo:
+    setPasswordSuccess(true);
+    setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' }); // Clear form
+    setTimeout(() => setPasswordSuccess(false), 3000); // Hide success message
+    // if (!result.success) {
+    //   setPasswordErrors({ general: result.error || 'Failed to change password.' });
+    // }
+  };
+
+  // TODO: Implement handleSettingsSubmit if these settings need to be saved to a backend.
+  // const handleSettingsSubmit = async () => { ... }
 
   return (
     <Box>

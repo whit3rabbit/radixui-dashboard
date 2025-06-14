@@ -1,6 +1,12 @@
+/**
+ * @file DashboardLayout.tsx
+ * @description This file defines the main layout for the dashboard pages.
+ * It includes a sidebar for navigation and a header with user information and actions.
+ * The main content of each dashboard page is rendered via the <Outlet /> component.
+ */
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { Flex, Box, Card, Text, IconButton, Separator, DropdownMenu, Avatar } from '@radix-ui/themes'
-import { 
+import {
   DashboardIcon, 
   PersonIcon, 
   GearIcon, 
@@ -20,6 +26,12 @@ import { useAuth } from '../lib/auth-context'
 import { NotificationCenter } from './notifications/NotificationCenter'
 import { ThemeSelector } from './ThemeSelector'
 
+/**
+ * @function DashboardLayout
+ * @description The main layout component for the dashboard area.
+ * It sets up the sidebar, header, and content area for all dashboard pages.
+ * @returns {JSX.Element} The rendered dashboard layout.
+ */
 export default function DashboardLayout() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
@@ -179,13 +191,32 @@ export default function DashboardLayout() {
   )
 }
 
-function SidebarItem({ icon, label, active = false }: { icon: React.ReactNode; label: string; active?: boolean }) {
+/**
+ * @interface SidebarItemProps
+ * @description Defines the props for the SidebarItem component.
+ * @property {React.ReactNode} icon - The icon to display for the sidebar item.
+ * @property {string} label - The text label for the sidebar item.
+ * @property {boolean} [active=false] - Whether the sidebar item is currently active.
+ */
+interface SidebarItemProps {
+  icon: React.ReactNode
+  label: string
+  active?: boolean
+}
+
+/**
+ * @function SidebarItem
+ * @description A component to render individual items in the sidebar.
+ * @param {SidebarItemProps} props - The props for the SidebarItem component.
+ * @returns {JSX.Element} The rendered sidebar item.
+ */
+function SidebarItem({ icon, label, active = false }: SidebarItemProps) {
   return (
-    <Flex 
-      align="center" 
-      gap="3" 
-      p="2" 
-      style={{ 
+    <Flex
+      align="center"
+      gap="3"
+      p="2"
+      style={{
         borderRadius: '6px',
         cursor: 'pointer',
         backgroundColor: active ? 'var(--gray-4)' : 'transparent',

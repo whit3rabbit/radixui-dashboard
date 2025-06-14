@@ -1,8 +1,16 @@
+/**
+ * @file Forms.tsx
+ * @description This file defines the Forms page component for the dashboard.
+ * It serves as a comprehensive showcase of various form elements, input types,
+ * selection controls, and form layouts available within the application,
+ * primarily utilizing Radix UI theme components.
+ * It demonstrates the look and feel and basic state management for these components.
+ */
 import { useState } from 'react'
-import { 
-  Box, 
-  Card, 
-  Flex, 
+import {
+  Box,
+  Card,
+  Flex,
   Heading, 
   Text, 
   TextField, 
@@ -25,21 +33,47 @@ import {
   CheckCircledIcon
 } from '@radix-ui/react-icons'
 
+/**
+ * @typedef MultiStepFormData
+ * @description Defines the structure for the data collected in the multi-step form example.
+ * @property {string} firstName - User's first name.
+ * @property {string} lastName - User's last name.
+ * @property {string} email - User's email address.
+ * @property {string} company - User's company name.
+ * @property {string} role - User's role in the company.
+ * @property {boolean} notifications - Whether the user opts into notifications.
+ */
+type MultiStepFormData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  company: string;
+  role: string;
+  notifications: boolean;
+};
+
+/**
+ * @function Forms
+ * @description The main component for the Forms showcase page.
+ * It displays a variety of form components and layouts with their basic states managed.
+ * This page is intended for demonstration and testing of form elements.
+ * @returns {JSX.Element} The rendered Forms page.
+ */
 export default function Forms() {
-  // Form states
-  const [textValue, setTextValue] = useState('')
-  const [emailValue, setEmailValue] = useState('')
+  // --- State for Basic Input Examples ---
+  const [textValue, setTextValue] = useState('');
+  const [emailValue, setEmailValue] = useState('');
   const [passwordValue, setPasswordValue] = useState('')
-  const [textAreaValue, setTextAreaValue] = useState('')
-  const [selectValue, setSelectValue] = useState('option1')
-  const [checkboxValue, setCheckboxValue] = useState(false)
-  const [radioValue, setRadioValue] = useState('1')
-  const [switchValue, setSwitchValue] = useState(false)
-  const [sliderValue, setSliderValue] = useState([50])
-  
-  // Multi-step form state
-  const [currentStep, setCurrentStep] = useState(1)
-  const [formData, setFormData] = useState({
+  const [textAreaValue, setTextAreaValue] = useState('');
+  const [selectValue, setSelectValue] = useState('option1'); // Default value for a select example
+  const [checkboxValue, setCheckboxValue] = useState(false); // State for a controlled checkbox
+  const [radioValue, setRadioValue] = useState('1'); // State for a controlled radio group
+  const [switchValue, setSwitchValue] = useState(false); // State for a controlled switch
+  const [sliderValue, setSliderValue] = useState([50]); // State for a controlled slider
+
+  // --- State for Multi-Step Form Example ---
+  const [currentStep, setCurrentStep] = useState(1); // Current active step in the multi-step form
+  const [formData, setFormData] = useState<MultiStepFormData>({ // Data collected across steps
     firstName: '',
     lastName: '',
     email: '',

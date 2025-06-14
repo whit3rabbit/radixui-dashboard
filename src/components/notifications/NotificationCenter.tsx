@@ -1,7 +1,13 @@
+/**
+ * @file NotificationCenter.tsx
+ * @description This file defines the NotificationCenter component, which displays
+ * notifications to the user in a dropdown menu. It includes functionality for
+ * marking notifications as read, deleting individual notifications, and clearing all.
+ */
 import { useState } from 'react'
-import { 
-  IconButton, 
-  Badge, 
+import {
+  IconButton,
+  Badge,
   DropdownMenu, 
   Text, 
   Flex, 
@@ -11,11 +17,22 @@ import {
   Separator
 } from '@radix-ui/themes'
 import { 
-  BellIcon, 
+  BellIcon,
   DotFilledIcon,
   TrashIcon
 } from '@radix-ui/react-icons'
 
+/**
+ * @interface Notification
+ * @description Defines the structure of a notification object.
+ * @property {string} id - Unique identifier for the notification.
+ * @property {string} title - The title of the notification.
+ * @property {string} description - A more detailed description of the notification.
+ * @property {Date} timestamp - The time when the notification was generated.
+ * @property {boolean} read - Whether the notification has been read by the user.
+ * @property {'info' | 'success' | 'warning' | 'error'} type - The type of notification, influencing its display.
+ * @property {{ label: string; onClick: () => void; }} [action] - An optional action button for the notification.
+ */
 export interface Notification {
   id: string
   title: string
@@ -29,7 +46,12 @@ export interface Notification {
   }
 }
 
-// Mock notifications for demo
+// TODO: Replace mockNotifications with actual data fetching or state management from a global store.
+/**
+ * @const mockNotifications
+ * @description A list of mock notifications used for demonstration purposes.
+ * This should be replaced with a real notification data source in a production application.
+ */
 const mockNotifications: Notification[] = [
   {
     id: '1',
@@ -69,33 +91,65 @@ const mockNotifications: Notification[] = [
   }
 ]
 
+/**
+ * @function NotificationCenter
+ * @description A component that displays a list of notifications in a dropdown menu.
+ * It allows users to view, mark as read, and delete notifications.
+ * Uses mock data for now, but is designed to be integrated with a real notification system.
+ * @returns {JSX.Element} The rendered NotificationCenter component.
+ */
 export function NotificationCenter() {
+  // TODO: Integrate with a global notification store or context instead of local state.
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications)
   const [open, setOpen] = useState(false)
-  
+
   const unreadCount = notifications.filter(n => !n.read).length
 
+  /**
+   * @function markAsRead
+   * @description Marks a specific notification as read.
+   * @param {string} id - The ID of the notification to mark as read.
+   */
   const markAsRead = (id: string) => {
-    setNotifications(prev => 
+    setNotifications(prev =>
       prev.map(n => n.id === id ? { ...n, read: true } : n)
     )
   }
 
+  /**
+   * @function markAllAsRead
+   * @description Marks all notifications as read.
+   */
   const markAllAsRead = () => {
-    setNotifications(prev => 
+    setNotifications(prev =>
       prev.map(n => ({ ...n, read: true }))
     )
   }
 
+  /**
+   * @function deleteNotification
+   * @description Deletes a specific notification.
+   * @param {string} id - The ID of the notification to delete.
+   */
   const deleteNotification = (id: string) => {
     setNotifications(prev => prev.filter(n => n.id !== id))
   }
 
+  /**
+   * @function clearAll
+   * @description Deletes all notifications.
+   */
   const clearAll = () => {
     setNotifications([])
   }
 
-  const formatTimestamp = (date: Date) => {
+  /**
+   * @function formatTimestamp
+   * @description Formats a date object into a human-readable relative time string (e.g., "5m ago", "2h ago").
+   * @param {Date} date - The date to format.
+   * @returns {string} The formatted relative time string.
+   */
+  const formatTimestamp = (date: Date): string => {
     const now = new Date()
     const diff = now.getTime() - date.getTime()
     const minutes = Math.floor(diff / 60000)

@@ -1,50 +1,85 @@
+/**
+ * @file Login.tsx
+ * @description This file defines the Login page component.
+ * It allows users to sign in using their email and password.
+ * It includes form validation, handles login attempts, displays errors,
+ * and provides links for password recovery and registration.
+ */
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Container, Card, Flex, Heading, Text, TextField, Button, Separator, Box, IconButton, Callout } from '@radix-ui/themes'
 import { EnvelopeClosedIcon, LockClosedIcon, SunIcon, MoonIcon, EyeOpenIcon, EyeClosedIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons'
 import { useTheme } from '../../lib/theme-context'
 import { useAuth } from '../../lib/auth-context'
-import { validateEmail, validatePassword } from '../../lib/validation'
+import { validateEmail, validatePassword } from '../../lib/validation' // Validation utilities
 
+/**
+ * @typedef LoginErrors
+ * @description Defines the structure for storing login form errors.
+ * @property {string} [email] - Error message for the email field.
+ * @property {string} [password] - Error message for the password field.
+ * @property {string} [general] - General error message (e.g., from API response).
+ */
+type LoginErrors = {
+  email?: string;
+  password?: string;
+  general?: string;
+};
+
+/**
+ * @function Login
+ * @description A component that renders the login page.
+ * It includes a form for email and password, handles form submission,
+ * validates input, calls the login function from `AuthContext`, and navigates
+ * to the dashboard on successful login or displays errors.
+ * @returns {JSX.Element} The rendered Login page.
+ */
 export default function Login() {
-  const { theme, toggleTheme } = useTheme()
-  const { login } = useAuth()
-  const navigate = useNavigate()
-  
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({})
+  const { theme, toggleTheme } = useTheme(); // Theme context for light/dark mode toggle
+  const { login } = useAuth(); // Auth context for login functionality
+  const navigate = useNavigate(); // React Router hook for navigation
 
+  const [email, setEmail] = useState(''); // State for email input
+  const [password, setPassword] = useState(''); // State for password input
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [isLoading, setIsLoading] = useState(false); // State to manage loading status during login
+  const [errors, setErrors] = useState<LoginErrors>({}); // State for storing form errors
+
+  /**
+   * @function handleSubmit
+   * @description Handles the login form submission.
+   * It validates email and password, calls the login function, and handles the response.
+   * @param {React.FormEvent} e - The form submission event.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault(); // Prevent default form submission
+
     // Validate fields
-    const emailError = validateEmail(email)
-    const passwordError = validatePassword(password)
-    
+    const emailError = validateEmail(email);
+    const passwordError = validatePassword(password);
+
     if (emailError || passwordError) {
       setErrors({
         email: emailError || undefined,
         password: passwordError || undefined,
-      })
-      return
+      });
+      return; // Stop submission if validation fails
     }
-    
-    setErrors({})
-    setIsLoading(true)
-    
-    const result = await login(email, password)
-    
+
+    setErrors({}); // Clear previous errors
+    setIsLoading(true); // Set loading state
+
+    const result = await login(email, password); // Attempt login
+
     if (result.success) {
-      navigate('/dashboard')
+      navigate('/dashboard'); // Navigate to dashboard on successful login
     } else {
-      setErrors({ general: result.error })
-      setIsLoading(false)
+      // Set general error from login attempt (e.g., "Invalid credentials")
+      setErrors({ general: result.error });
+      setIsLoading(false); // Reset loading state
     }
-  }
-  
+  };
+
   return (
     <Container size="1" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
       {/* Theme Toggle */}

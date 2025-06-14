@@ -1,6 +1,24 @@
+/**
+ * @file LoadingSpinner.tsx
+ * @description This file defines various loading indicator components used throughout the application.
+ * It includes a general `LoadingSpinner`, a `LoadingOverlay` for containers,
+ * a `Skeleton` component for placeholder loading, a `LoadingButton`, and a `PageLoading` component.
+ */
 import React from 'react';
 import { Flex, Box, Text, Spinner } from '@radix-ui/themes';
 
+/**
+ * @interface LoadingSpinnerProps
+ * @description Defines the props for the LoadingSpinner component.
+ * @property {'1' | '2' | '3'} [size='2'] - The size of the spinner.
+ * @property {string} [message='Loading...'] - An optional message to display below the spinner.
+ * @property {'default' | 'overlay' | 'fullscreen' | 'inline'} [variant='default'] - The display variant of the spinner.
+ *   - `default`: Centered in a flex container.
+ *   - `overlay`: Covers its parent container with a semi-transparent background.
+ *   - `fullscreen`: Covers the entire screen.
+ *   - `inline`: Displays spinner and message in a row.
+ * @property {string} [className] - Additional CSS classes for custom styling.
+ */
 interface LoadingSpinnerProps {
   size?: '1' | '2' | '3';
   message?: string;
@@ -8,15 +26,21 @@ interface LoadingSpinnerProps {
   className?: string;
 }
 
-export function LoadingSpinner({ 
-  size = '2', 
-  message = 'Loading...', 
+/**
+ * @function LoadingSpinner
+ * @description A versatile loading spinner component with different display variants.
+ * @param {LoadingSpinnerProps} props - The props for the component.
+ * @returns {JSX.Element} The rendered loading spinner.
+ */
+export function LoadingSpinner({
+  size = '2',
+  message = 'Loading...',
   variant = 'default',
-  className 
+  className
 }: LoadingSpinnerProps) {
   const baseStyles = {
     overlay: {
-      position: 'absolute' as const,
+      position: 'absolute' as const, // Ensures type safety for CSS properties
       top: 0,
       left: 0,
       right: 0,
@@ -91,7 +115,14 @@ export function LoadingSpinner({
   );
 }
 
-// Loading overlay component for containers
+/**
+ * @interface LoadingOverlayProps
+ * @description Defines the props for the LoadingOverlay component.
+ * @property {boolean} loading - Whether the loading overlay is active.
+ * @property {React.ReactNode} children - The content to be overlaid.
+ * @property {string} [message='Loading...'] - Message for the spinner within the overlay.
+ * @property {'1' | '2' | '3'} [size='2'] - Size of the spinner within the overlay.
+ */
 interface LoadingOverlayProps {
   loading: boolean;
   children: React.ReactNode;
@@ -99,11 +130,18 @@ interface LoadingOverlayProps {
   size?: '1' | '2' | '3';
 }
 
-export function LoadingOverlay({ 
-  loading, 
-  children, 
-  message = 'Loading...', 
-  size = '2' 
+/**
+ * @function LoadingOverlay
+ * @description A component that displays a loading spinner as an overlay on top of its children.
+ * Useful for indicating loading state within a specific container or section.
+ * @param {LoadingOverlayProps} props - The props for the component.
+ * @returns {JSX.Element} The rendered LoadingOverlay with its children.
+ */
+export function LoadingOverlay({
+  loading,
+  children,
+  message = 'Loading...',
+  size = '2'
 }: LoadingOverlayProps) {
   return (
     <Box style={{ position: 'relative' }}>
@@ -119,7 +157,16 @@ export function LoadingOverlay({
   );
 }
 
-// Skeleton loading component
+/**
+ * @interface SkeletonProps
+ * @description Defines the props for the Skeleton component.
+ * @property {boolean} loading - If true, displays the skeleton; otherwise, renders children.
+ * @property {React.ReactNode} children - The actual content to render when not loading.
+ * @property {string | number} [width='100%'] - The width of the skeleton element(s).
+ * @property {string | number} [height='20px'] - The height of the skeleton element(s).
+ * @property {number} [lines=1] - If greater than 1, renders multiple skeleton lines.
+ * @property {string} [className] - Additional CSS classes for custom styling.
+ */
 interface SkeletonProps {
   loading: boolean;
   children: React.ReactNode;
@@ -129,13 +176,20 @@ interface SkeletonProps {
   className?: string;
 }
 
-export function Skeleton({ 
-  loading, 
-  children, 
-  width = '100%', 
-  height = '20px', 
+/**
+ * @function Skeleton
+ * @description A component that displays a placeholder skeleton UI while content is loading.
+ * It can render a single block or multiple lines.
+ * @param {SkeletonProps} props - The props for the component.
+ * @returns {JSX.Element} The skeleton placeholder or the actual children content.
+ */
+export function Skeleton({
+  loading,
+  children,
+  width = '100%',
+  height = '20px',
   lines = 1,
-  className 
+  className
 }: SkeletonProps) {
   if (!loading) {
     return <>{children}</>;
@@ -157,69 +211,101 @@ export function Skeleton({
   return (
     <Flex direction="column" gap="2" className={className}>
       {Array.from({ length: lines }, (_, i) => (
-        <Box 
-          key={i} 
+        <Box
+          key={i}
           style={{
             ...skeletonStyle,
-            width: i === lines - 1 ? '80%' : '100%'
-          }} 
+            width: i === lines - 1 ? '80%' : '100%' // Last line can be shorter
+          }}
         />
       ))}
     </Flex>
   );
 }
 
-// Loading button component
+/**
+ * @interface LoadingButtonProps
+ * @extends React.ButtonHTMLAttributes<HTMLButtonElement>
+ * @description Defines the props for the LoadingButton component.
+ * @property {boolean} [loading=false] - If true, shows a spinner and disables the button.
+ * @property {React.ReactNode} children - The content of the button (text or icon).
+ * @property {string} [loadingText] - Optional text to display next to the spinner when loading. Defaults to children.
+ * @property {'solid' | 'soft' | 'outline' | 'ghost'} [variant] - Radix UI button variant (styling purposes, not directly applied here yet).
+ * @property {'1' | '2' | '3' | '4'} [size] - Radix UI button size (styling purposes, not directly applied here yet).
+ */
 interface LoadingButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
   children: React.ReactNode;
   loadingText?: string;
-  variant?: 'solid' | 'soft' | 'outline' | 'ghost';
-  size?: '1' | '2' | '3' | '4';
+  variant?: 'solid' | 'soft' | 'outline' | 'ghost'; // For potential future Radix Button integration
+  size?: '1' | '2' | '3' | '4'; // For potential future Radix Button integration
 }
 
+/**
+ * @function LoadingButton
+ * @description A button component that can display a loading state with a spinner.
+ * It wraps a standard HTML button and adds loading indicators.
+ * @param {LoadingButtonProps} props - The props for the component.
+ * @returns {JSX.Element} The rendered loading button.
+ */
 export function LoadingButton({
   loading = false,
   children,
   loadingText,
   disabled,
   className,
+  // variant, // Not used directly, but kept for API consistency if <Button> is used
+  // size,    // Not used directly
   ...props
 }: LoadingButtonProps) {
   return (
+    // Consider using <Button> from @radix-ui/themes for consistency if advanced styling is needed.
+    // For now, a simple HTML button is used to demonstrate the loading state.
     <button
       {...props}
       disabled={loading || disabled}
-      className={className}
+      className={className} // Allow custom classes
       style={{
-        display: 'inline-flex',
+        display: 'inline-flex', // Ensures spinner and text align well
         alignItems: 'center',
-        gap: '8px',
-        ...props.style
+        gap: '8px', // Space between spinner and text
+        ...props.style // Allow overriding styles
       }}
     >
-      {loading && <Spinner size="1" />}
+      {loading && <Spinner size="1" />} {/* Radix Spinner */}
       {loading ? (loadingText || children) : children}
     </button>
   );
 }
 
-// Enhanced page loading component
+/**
+ * @interface PageLoadingProps
+ * @description Defines the props for the PageLoading component.
+ * @property {string} [message='Loading...'] - The main loading message.
+ * @property {string} [submessage] - An optional sub-message displayed below the main message.
+ */
 interface PageLoadingProps {
   message?: string;
   submessage?: string;
 }
 
-export function PageLoading({ 
-  message = 'Loading...', 
-  submessage 
+/**
+ * @function PageLoading
+ * @description A component to display a full-page loading indicator.
+ * Useful for initial page loads or significant transitions.
+ * @param {PageLoadingProps} props - The props for the component.
+ * @returns {JSX.Element} The rendered page loading indicator.
+ */
+export function PageLoading({
+  message = 'Loading...',
+  submessage
 }: PageLoadingProps) {
   return (
-    <Flex 
-      direction="column" 
-      align="center" 
-      justify="center" 
-      style={{ minHeight: '400px' }}
+    <Flex
+      direction="column"
+      align="center"
+      justify="center"
+      style={{ minHeight: '400px' }} // Ensure it takes up significant space
       gap="4"
     >
       <Spinner size="3" />
@@ -237,7 +323,8 @@ export function PageLoading({
   );
 }
 
-// Add keyframes for shimmer animation
+// Add keyframes for shimmer animation used by Skeleton component.
+// This ensures the animation is globally available.
 const style = document.createElement('style');
 style.textContent = `
   @keyframes shimmer {

@@ -1,3 +1,8 @@
+/**
+ * @file App.tsx
+ * @description This file defines the main application component, including routing and theme setup.
+ * It serves as the entry point for the application's UI.
+ */
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Theme } from '@radix-ui/themes'
 import DashboardLayout from './components/DashboardLayout'
@@ -22,6 +27,12 @@ import { AuthProvider, ProtectedRoute, useAuth } from './lib/auth-context'
 import { ToastProvider } from './components/notifications/toast-context'
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
 
+/**
+ * @function AppRoutes
+ * @description Defines the application's routing structure and applies the selected theme.
+ * It determines which component to render based on the current URL and authentication status.
+ * @returns {JSX.Element} The rendered routes within the application's theme.
+ */
 function AppRoutes() {
   const { themeConfig, getSystemTheme } = useTheme()
   const { isAuthenticated } = useAuth()
@@ -69,6 +80,12 @@ function AppRoutes() {
   )
 }
 
+/**
+ * @function App
+ * @description The main application component.
+ * It wraps the application with error boundaries and context providers for theme, authentication, and toasts.
+ * @returns {JSX.Element} The main application structure.
+ */
 function App() {
   return (
     <ErrorBoundary showErrorDetails={true}>

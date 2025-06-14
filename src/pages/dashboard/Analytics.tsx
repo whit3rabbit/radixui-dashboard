@@ -1,6 +1,13 @@
-import { 
-  Box, 
-  Heading, 
+/**
+ * @file Analytics.tsx
+ * @description This file defines the Analytics page component for the dashboard.
+ * It displays various charts and key performance indicators (KPIs) related to
+ * website traffic, conversions, revenue, and product performance.
+ * All data displayed is currently mock data.
+ */
+import {
+  Box,
+  Heading,
   Grid,
   Card,
   Flex,
@@ -17,10 +24,22 @@ import {
   CubeIcon,
   ReaderIcon
 } from '@radix-ui/react-icons'
-import Chart from '../../components/Chart'
+import Chart from '../../components/Chart' // Reusable Chart component
 
+/**
+ * @function Analytics
+ * @description The main component for the Analytics page.
+ * It renders various statistical cards and charts to visualize business data.
+ * Currently uses mock data for demonstration.
+ * @returns {JSX.Element} The rendered Analytics page.
+ */
 export default function Analytics() {
-  // Mock data for various analytics
+  // TODO: Replace all mock data with actual data fetched from an API or data source.
+
+  /**
+   * @const trafficData
+   * @description Mock data for traffic sources chart (e.g., Direct, Organic, Referral).
+   */
   const trafficData = [
     {
       name: 'Direct',
@@ -36,31 +55,50 @@ export default function Analytics() {
     }
   ]
 
+  /**
+   * @const conversionData
+   * @description Mock data for the conversion rate chart.
+   */
   const conversionData = [
     {
-      name: 'Conversion Rate',
-      data: [2.1, 2.3, 2.8, 3.1, 2.9, 3.4, 3.8]
+      name: 'Conversion Rate', // Represents the percentage of visitors who complete a desired action
+      data: [2.1, 2.3, 2.8, 3.1, 2.9, 3.4, 3.8] // Example: daily conversion rates
     }
   ]
 
+  /**
+   * @const revenueByCategory
+   * @description Mock data for the revenue by category pie chart.
+   * Each element in `data` corresponds to a category in `categories`.
+   */
   const revenueByCategory = [
     {
-      name: 'Revenue',
-      data: [44, 55, 41, 67, 22]
+      name: 'Revenue', // Series name
+      data: [44000, 55000, 41000, 67000, 22000] // Example revenue for each category
     }
   ]
 
+  /**
+   * @const topProducts
+   * @description Mock data for the list of top-performing products.
+   * Includes product name, sales count, total revenue, and growth percentage.
+   */
   const topProducts = [
     { name: 'Wireless Headphones', sales: 1234, revenue: 123340, growth: 12.5 },
-    { name: 'Smart Watch', sales: 892, revenue: 222908, growth: -5.2 },
+    { name: 'Smart Watch', sales: 892, revenue: 222908, growth: -5.2 }, // Negative growth example
     { name: 'Running Shoes', sales: 756, revenue: 67944, growth: 23.1 },
     { name: 'Laptop Backpack', sales: 634, revenue: 31666, growth: 8.7 },
     { name: 'Bluetooth Speaker', sales: 521, revenue: 41659, growth: 15.3 }
   ]
 
+  /**
+   * @const metrics
+   * @description Mock data for key performance indicators (KPIs) displayed in stat cards.
+   * Includes title, value, percentage change, positive/negative status, and an icon.
+   */
   const metrics = [
     {
-      title: 'Page Views',
+      title: 'Page Views', // Total number of pages viewed
       value: '284,312',
       change: '+12.5%',
       isPositive: true,
@@ -82,14 +120,23 @@ export default function Analytics() {
     },
     {
       title: 'Bounce Rate',
-      value: '42.3%',
-      change: '-2.1%',
-      isPositive: true,
+      value: '42.3%', // Percentage of single-page sessions
+      change: '-2.1%', // Negative change is good for bounce rate
+      isPositive: true, // Interpreted as a positive outcome (lower bounce rate)
       icon: <CubeIcon />
     }
   ]
 
+  /**
+   * @const days
+   * @description Labels for the x-axis of time-based charts (e.g., days of the week).
+   */
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+  /**
+   * @const categories
+   * @description Labels for categories in charts (e.g., product categories for revenue pie chart).
+   */
   const categories = ['Electronics', 'Footwear', 'Accessories', 'Sports', 'Appliances']
 
   return (

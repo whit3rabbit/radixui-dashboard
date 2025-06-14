@@ -1,8 +1,15 @@
+/**
+ * @file ServerError.tsx
+ * @description This file defines the 500 Internal Server Error page component.
+ * It is displayed when an unexpected server-side error occurs.
+ * The page provides users with information about the error (including optional technical details),
+ * and offers actions such as retrying, returning to the dashboard, or reporting the issue.
+ */
 import { Link } from 'react-router-dom'
 import { Container, Flex, Heading, Text, Button, Card, Box, Code, Callout } from '@radix-ui/themes'
-import { 
-  HomeIcon, 
-  ReloadIcon, 
+import {
+  HomeIcon,
+  ReloadIcon,
   ExclamationTriangleIcon,
   ChevronDownIcon,
   ChevronUpIcon,
@@ -10,30 +17,69 @@ import {
 } from '@radix-ui/react-icons'
 import { useState } from 'react'
 
+/**
+ * @interface ErrorDetails
+ * @description Defines the structure for mock error details displayed on the page.
+ * @property {string} timestamp - ISO string of when the error occurred.
+ * @property {string} errorCode - A specific code for the error (e.g., 'INTERNAL_SERVER_ERROR').
+ * @property {string} message - A user-friendly error message.
+ * @property {string} requestId - A unique identifier for the request that caused the error.
+ * @property {string} stackTrace - A (mock) stack trace for debugging.
+ */
+interface ErrorDetails {
+  timestamp: string;
+  errorCode: string;
+  message: string;
+  requestId: string;
+  stackTrace: string;
+}
+
+/**
+ * @function ServerError
+ * @description A component that renders the 500 Internal Server Error page.
+ * It displays error information, including toggleable technical details (mocked),
+ * and provides users with actions like retrying the page load or navigating to safety.
+ * @returns {JSX.Element} The rendered 500 Server Error page.
+ */
 export default function ServerError() {
-  const [showDetails, setShowDetails] = useState(false)
-  
-  // Mock error details
-  const errorDetails = {
+  const [showDetails, setShowDetails] = useState(false); // State to toggle visibility of technical error details
+
+  // Mock error details for demonstration. In a real application, these might come from error state or context.
+  /**
+   * @const errorDetails
+   * @description Mock object containing details about the server error.
+   */
+  const errorDetails: ErrorDetails = {
     timestamp: new Date().toISOString(),
     errorCode: 'INTERNAL_SERVER_ERROR',
-    message: 'An unexpected error occurred while processing your request',
-    requestId: 'req_' + Math.random().toString(36).substring(7),
-    stackTrace: `Error: Database connection timeout
-    at DatabaseConnection.connect (/app/src/db/connection.js:42:15)
+    message: 'An unexpected error occurred while processing your request.',
+    requestId: 'req_' + Math.random().toString(36).substring(2, 11), // Generate a mock request ID
+    stackTrace: `Error: Database connection timeout at DatabaseConnection.connect (/app/src/db/connection.js:42:15)
     at async UserService.findById (/app/src/services/user.service.js:18:5)
     at async UserController.getUser (/app/src/controllers/user.controller.js:25:20)
-    at async /app/src/middleware/errorHandler.js:10:5`
-  }
+    at async /app/src/middleware/errorHandler.js:10:5
+    ... (more lines)`
+  };
 
+  /**
+   * @function handleRetry
+   * @description Reloads the current page, effectively retrying the last action.
+   */
   const handleRetry = () => {
-    window.location.reload()
-  }
+    window.location.reload();
+  };
 
+  /**
+   * @function handleReportIssue
+   * @description Placeholder function for reporting an issue.
+   * In a real application, this would integrate with a bug tracking or support system.
+   * Currently, it logs the error details to the console.
+   */
   const handleReportIssue = () => {
-    // In a real app, this would open a support ticket or send an error report
-    console.log('Reporting issue:', errorDetails)
-  }
+    // TODO: Implement actual issue reporting (e.g., send errorDetails to Sentry, LogRocket, or a custom backend)
+    console.error('Issue reported by user:', errorDetails);
+    alert('Thank you for reporting the issue. Our team has been notified.'); // Simple feedback
+  };
 
   return (
     <Container size="2" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center' }}>

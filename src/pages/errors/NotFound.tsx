@@ -1,17 +1,61 @@
+/**
+ * @file NotFound.tsx
+ * @description This file defines the 404 Not Found error page component.
+ * It is displayed when a user navigates to a route that does not exist.
+ * It provides a clear error message, a search bar (mock functionality),
+ * links to popular pages, and navigation options to go back or to the dashboard.
+ */
 import { Link } from 'react-router-dom'
 import { Container, Flex, Heading, Text, Button, TextField, Card, Box } from '@radix-ui/themes'
 import { MagnifyingGlassIcon, HomeIcon, FileTextIcon, PersonIcon, GearIcon } from '@radix-ui/react-icons'
 import { useState } from 'react'
 
-export default function NotFound() {
-  const [searchQuery, setSearchQuery] = useState('')
+/**
+ * @typedef PopularLink
+ * @description Defines the structure for a popular link item.
+ * @property {string} title - The display text for the link.
+ * @property {string} href - The URL path for the link.
+ * @property {JSX.Element} icon - An icon component to display next to the link title.
+ */
+type PopularLink = {
+  title: string;
+  href: string;
+  icon: JSX.Element;
+};
 
-  const popularLinks = [
+/**
+ * @function NotFound
+ * @description A component that renders the 404 Page Not Found error page.
+ * It includes a search bar (with mock submission logic), a list of popular navigation links,
+ * and options to return to the dashboard or the previous page.
+ * @returns {JSX.Element} The rendered 404 Not Found page.
+ */
+export default function NotFound() {
+  const [searchQuery, setSearchQuery] = useState(''); // State for the search input
+
+  /**
+   * @const popularLinks
+   * @description An array of `PopularLink` objects representing common pages users might want to navigate to.
+   */
+  const popularLinks: PopularLink[] = [
     { title: 'Dashboard', href: '/dashboard', icon: <HomeIcon /> },
     { title: 'Profile', href: '/dashboard/profile', icon: <PersonIcon /> },
     { title: 'Settings', href: '/dashboard/settings', icon: <GearIcon /> },
     { title: 'Forms', href: '/dashboard/forms', icon: <FileTextIcon /> }
-  ]
+  ];
+
+  /**
+   * @function handleSearchSubmit
+   * @description Handles the submission of the search form.
+   * Currently logs the search query to the console.
+   * @param {React.FormEvent} e - The form submission event.
+   */
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // TODO: Implement actual search functionality or redirect to a search results page.
+    console.log('Search submitted for:', searchQuery);
+    // Example: navigate(`/search?q=${searchQuery}`);
+  };
 
   return (
     <Container size="2" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center' }}>
@@ -33,9 +77,9 @@ export default function NotFound() {
 
         {/* Search Bar */}
         <Card style={{ width: '100%', maxWidth: '500px' }}>
-          <form onSubmit={(e) => { e.preventDefault(); console.log('Search:', searchQuery) }}>
+          <form onSubmit={handleSearchSubmit}>
             <Flex gap="2">
-              <TextField.Root 
+              <TextField.Root
                 placeholder="Search for pages..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
